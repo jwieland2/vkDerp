@@ -167,6 +167,3 @@ void DerpImage::createDepthBuffer(std::unique_ptr<DerpPhysicalDevice>& physicalD
 
 	view = device->handle.createImageView(imageViewCreateInfo);
 }
-
-
-

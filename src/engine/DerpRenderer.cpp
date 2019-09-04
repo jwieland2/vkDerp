@@ -166,6 +166,9 @@ void DerpRenderer::recreateSwapChain()
 
 void DerpRenderer::cleanup()
 {
+	std::cout << "--depth image" << std::endl;
+	vmaDestroyImage(allocator, depthBuffer->handle, depthBuffer->allocation);
+
 	std::cout << "--swapchain" << std::endl;
 	cleanupSwapChain();
 
@@ -174,9 +177,6 @@ void DerpRenderer::cleanup()
 
 	std::cout << "--texture view" << std::endl;
 	device->handle.destroyImageView(texture->view);
-
-	std::cout << "--depth view" << std::endl;
-	device->handle.destroyImageView(depthBuffer->view);
 
 	std::cout << "--descriptorSetLayout" << std::endl;
 	device->handle.destroyDescriptorSetLayout(descriptorSetLayout->handle);
@@ -193,8 +193,7 @@ void DerpRenderer::cleanup()
 	surface.release();
 
 	std::cout << "--Vma" << std::endl;
-	std::cout << "\t--depth image" << std::endl;
-	vmaDestroyImage(allocator, depthBuffer->handle, depthBuffer->allocation);
+
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
 	std::cout << "\t--vertex buffer" << std::endl;

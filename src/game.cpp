@@ -15,5 +15,6 @@ void Game::mainLoop()
     }
 
     renderer->device->handle.waitIdle();
+	delete renderer;
 }
 
