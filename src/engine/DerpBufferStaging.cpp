@@ -40,3 +40,7 @@ void DerpBufferStaging::copy(unsigned char*& data)
 	std::memcpy(bufferAllocInfo.pMappedData, data, size);
 }
 
+void DerpBufferStaging::destroyVma(VmaAllocator& allocator)
+{
+	vmaDestroyBuffer(allocator, buffer, allocation);
+}

@@ -33,9 +33,6 @@
     <ClCompile Include="src\engine\DerpCommandPool.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\DerpDepthBuffer.cpp">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\DerpDescriptorPool.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
@@ -72,9 +69,6 @@
     <ClCompile Include="src\engine\DerpShader.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\DerpStagedBuffer.cpp">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\DerpSurface.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
@@ -102,6 +96,9 @@
     <ClCompile Include="src\engine\DerpRenderer.cpp">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\DerpBufferLocal.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game.h">
@@ -123,9 +120,6 @@
       <Filter>Header Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\DerpCommandPool.h">
-      <Filter>Header Files\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\engine\DerpDepthBuffer.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\DerpDescriptorPool.h">
@@ -164,9 +158,6 @@
     <ClInclude Include="src\engine\DerpShader.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\DerpStagedBuffer.h">
-      <Filter>Header Files\engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\engine\DerpSurface.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
@@ -183,6 +174,9 @@
       <Filter>Header Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\DerpRenderer.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\DerpBufferLocal.h">
       <Filter>Header Files\engine</Filter>
     </ClInclude>
   </ItemGroup>

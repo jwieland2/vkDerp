@@ -18,6 +18,8 @@ public:
 	void copy(std::vector<uint16_t> data);
 	void copy(unsigned char*&  imageData);
 
+	void destroyVma(VmaAllocator& allocator);
+
 	vk::DeviceSize size;
 	
 	vk::Buffer buffer;

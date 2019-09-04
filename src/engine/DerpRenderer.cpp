@@ -35,36 +35,38 @@ void DerpRenderer::initVma()
 
 void DerpRenderer::initVulkan()
 {
-	instance = std::make_unique<DerpInstance>();
-	surface = std::make_unique<DerpSurface>(instance, window);
-	physicalDevice = std::make_unique<DerpPhysicalDevice>(instance, surface);
-	device = std::make_unique<DerpDevice>(physicalDevice);
+	// context
+	instance		= std::make_unique<DerpInstance>();
+	surface			= std::make_unique<DerpSurface>(instance, window);
+	physicalDevice  = std::make_unique<DerpPhysicalDevice>(instance, surface);
+	device			= std::make_unique<DerpDevice>(physicalDevice);
 
+	// memory management
 	initVma();
 
-	swapChain = std::make_unique<DerpSwapChain>(window, surface, physicalDevice, device);
-	depthBuffer = std::make_unique<DerpImage>();
+	// graphics queue
+	swapChain		= std::make_unique<DerpSwapChain>(window, surface, physicalDevice, device);
+	depthBuffer		= std::make_unique<DerpImage>();
 	depthBuffer->createDepthBuffer(physicalDevice, device, swapChain, allocator);
-
-	renderPass = std::make_unique<DerpRenderPass>(device, swapChain);
-	framebuffers = std::make_unique<DerpFramebuffers>(device, swapChain, depthBuffer, renderPass);
+	renderPass		= std::make_unique<DerpRenderPass>(device, swapChain);
+	framebuffers	= std::make_unique<DerpFramebuffers>(device, swapChain, depthBuffer, renderPass);
 	descriptorSetLayout = std::make_unique<DerpDescriptorSetLayout>(device);
-	pipeline = std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
-	commandPool = std::make_unique<DerpCommandPool>(physicalDevice, device);
+	pipeline		= std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
+	commandPool		= std::make_unique<DerpCommandPool>(physicalDevice, device);
 
-	texture = std::make_unique<DerpImage>();
+	// buffers
+	texture			= std::make_unique<DerpImage>();
 	texture->createTexture(device, commandPool, allocator);
-	sampler = std::make_unique<DerpSampler>(device);
+	sampler			= std::make_unique<DerpSampler>(device);
+	vertexBuffer	= std::make_unique<DerpBufferLocal>(device, commandPool, vertices, allocator);
+	indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, indices, allocator);
+	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, swapChain, allocator);
 
-
-
-	vertexBuffer = std::make_unique<DerpStagedBuffer>(device, commandPool, vertices, allocator);
-	indexBuffer = std::make_unique<DerpStagedBuffer>(device, commandPool, indices, allocator);
-	uniformBuffer = std::make_unique<DerpBufferUniform>(device, swapChain, allocator);
-	descriptorPool = std::make_unique<DerpDescriptorPool>(device, swapChain);
-	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
-	commandBuffers = std::make_unique<DerpCommandBuffer>(device, swapChain, renderPass, pipeline, commandPool, framebuffers, vertexBuffer, indexBuffer, p4);
-	sync = std::make_unique<DerpSync>(device);
+	// rendering
+	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
+	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
+	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, swapChain, renderPass, pipeline, commandPool, framebuffers, vertexBuffer, indexBuffer, p4);
+	sync			= std::make_unique<DerpSync>(device);
 }
 
 
@@ -93,6 +95,10 @@ void DerpRenderer::cleanupSwapChain()
 		device->handle.destroyFramebuffer(framebuffer, nullptr);
 	}
 	framebuffers.reset();
+
+	std::cout << "\t--depthBuffer" << std::endl;
+	device->handle.destroyImageView(depthBuffer->view);
+	depthBuffer.reset();
 
 	for (auto imgViews : swapChain->imageViews)
 	{
@@ -137,6 +143,10 @@ void DerpRenderer::recreateSwapChain()
 
 	pipeline = std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
 	//std::cout << "++pipeline" << std::endl;
+
+	depthBuffer = std::make_unique<DerpImage>();
+	depthBuffer->createDepthBuffer(physicalDevice, device, swapChain, allocator);
+	//std::cout << "++depthBuffer" << std::endl;
 
 	framebuffers = std::make_unique<DerpFramebuffers>(device, swapChain, depthBuffer, renderPass);
 	//std::cout << "++framebuffers" << std::endl;
@@ -188,9 +198,9 @@ void DerpRenderer::cleanup()
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
 	std::cout << "\t--vertex buffer" << std::endl;
-	vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->bufferAllocation);
+	vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
 	std::cout << "\t--index buffer" << std::endl;
-	vmaDestroyBuffer(allocator, indexBuffer->buffer, indexBuffer->bufferAllocation);
+	vmaDestroyBuffer(allocator, indexBuffer->buffer, indexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
 	vmaDestroyBuffer(allocator, uniformBuffer->uniformBuffers[0], uniformBuffer->bufferAllocation);
 	std::cout << "\t--allocator" << std::endl;

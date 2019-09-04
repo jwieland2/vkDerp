@@ -2,6 +2,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 #include "vk_mem_alloc.h"
 #include "FpsMonitor.h"
 #include "Vertex.h"
@@ -15,9 +18,10 @@
 #include "DerpPipeline.h"
 #include "DerpFramebuffers.h"
 #include "DerpCommandPool.h"
+#include "DerpBufferLocal.h"
 #include "DerpImage.h"
 #include "DerpSampler.h"
-#include "DerpStagedBuffer.h"
+//#include "DerpStagedBuffer.h"
 #include "DerpBufferUniform.h"
 #include "DerpDescriptorPool.h"
 #include "DerpDescriptorSet.h"
@@ -49,8 +53,8 @@ public:
 	std::unique_ptr<DerpImage> texture;
 	std::unique_ptr<DerpSampler> sampler;
 	std::unique_ptr<DerpImage> depthBuffer;
-	std::unique_ptr<DerpStagedBuffer> vertexBuffer;
-	std::unique_ptr<DerpStagedBuffer> indexBuffer;
+	std::unique_ptr<DerpBufferLocal> vertexBuffer;
+	std::unique_ptr<DerpBufferLocal> indexBuffer;
 	std::unique_ptr<DerpBufferUniform> uniformBuffer;
 	std::unique_ptr<DerpDescriptorPool> descriptorPool;
 	std::unique_ptr<DerpDescriptorSet> descriptorSet;

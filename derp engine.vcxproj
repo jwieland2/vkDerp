@@ -135,11 +135,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\DerpBufferLocal.cpp" />
     <ClCompile Include="src\engine\DerpBufferStaging.cpp" />
     <ClCompile Include="src\engine\DerpBufferUniform.cpp" />
     <ClCompile Include="src\engine\DerpCommandBuffer.cpp" />
     <ClCompile Include="src\engine\DerpCommandPool.cpp" />
-    <ClCompile Include="src\engine\DerpDepthBuffer.cpp" />
     <ClCompile Include="src\engine\DerpDescriptorPool.cpp" />
     <ClCompile Include="src\engine\DerpDescriptorSet.cpp" />
     <ClCompile Include="src\engine\DerpDescriptorSetLayout.cpp" />
@@ -153,7 +153,6 @@
     <ClCompile Include="src\engine\DerpRenderPass.cpp" />
     <ClCompile Include="src\engine\DerpSampler.cpp" />
     <ClCompile Include="src\engine\DerpShader.cpp" />
-    <ClCompile Include="src\engine\DerpStagedBuffer.cpp" />
     <ClCompile Include="src\engine\DerpSurface.cpp" />
     <ClCompile Include="src\engine\DerpSwapChain.cpp" />
     <ClCompile Include="src\engine\DerpSync.cpp" />
@@ -164,11 +163,11 @@
     <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\DerpBufferLocal.h" />
     <ClInclude Include="src\engine\DerpBufferStaging.h" />
     <ClInclude Include="src\engine\DerpBufferUniform.h" />
     <ClInclude Include="src\engine\DerpCommandBuffer.h" />
     <ClInclude Include="src\engine\DerpCommandPool.h" />
-    <ClInclude Include="src\engine\DerpDepthBuffer.h" />
     <ClInclude Include="src\engine\DerpDescriptorPool.h" />
     <ClInclude Include="src\engine\DerpDescriptorSet.h" />
     <ClInclude Include="src\engine\DerpDescriptorSetLayout.h" />
@@ -182,7 +181,6 @@
     <ClInclude Include="src\engine\DerpRenderPass.h" />
     <ClInclude Include="src\engine\DerpSampler.h" />
     <ClInclude Include="src\engine\DerpShader.h" />
-    <ClInclude Include="src\engine\DerpStagedBuffer.h" />
     <ClInclude Include="src\engine\DerpSurface.h" />
     <ClInclude Include="src\engine\DerpSwapChain.h" />
     <ClInclude Include="src\engine\DerpSync.h" />

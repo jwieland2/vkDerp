@@ -10,8 +10,9 @@
 #include "DerpRenderPass.h"
 #include "DerpPipeline.h"
 #include "DerpCommandPool.h"
+#include "DerpBufferLocal.h"
 #include "DerpFramebuffers.h"
-#include "DerpStagedBuffer.h"
+//#include "DerpStagedBuffer.h"
 
 
 class DerpCommandBuffer
@@ -24,8 +25,8 @@ public:
 		std::unique_ptr<DerpPipeline>& pipeline,
 		std::unique_ptr<DerpCommandPool>& commandPool,
 		std::unique_ptr<DerpFramebuffers>& framebuffers,
-		std::unique_ptr<DerpStagedBuffer>& vertexBuffer,
-		std::unique_ptr<DerpStagedBuffer>& indexBuffer,
+		std::unique_ptr<DerpBufferLocal>& vertexBuffer,
+		std::unique_ptr<DerpBufferLocal>& indexBuffer,
 		mvp4 &m);
 
 	~DerpCommandBuffer();
