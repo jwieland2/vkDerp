@@ -18,9 +18,10 @@ public:
 
 	std::chrono::time_point<std::chrono::steady_clock> lastFrame, currentFrame;
 	double glfwLastFrame, glfwCurrentFrame;
-	double dt, timeSinceUpdate;
+	double dt, timeSinceUpdate = 0.0;
 	double glfwdt, glfwTimeSinceUpdate;
 	double loss = 0.0;
 	double glfwloss = 0.0;
+	bool limit = false;
 };
 

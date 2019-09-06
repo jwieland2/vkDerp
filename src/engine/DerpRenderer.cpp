@@ -1,10 +1,13 @@
 #include "DerpRenderer.h"
 
+#include "../game.h"
+
 
 
 DerpRenderer::DerpRenderer()
 {
 	initWindow();
+	//fpsMonitor = FpsMonitor();
 	initVulkan();
 }
 
@@ -20,7 +23,7 @@ void DerpRenderer::initWindow()
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-	glfwSetWindowUserPointer(window, this);
+
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
@@ -44,7 +47,7 @@ void DerpRenderer::initVulkan()
 	// memory management
 	initVma();
 
-	// graphics queue
+	// graphics
 	swapChain		= std::make_unique<DerpSwapChain>(window, surface, physicalDevice, device);
 	depthBuffer		= std::make_unique<DerpImage>();
 	depthBuffer->createDepthBuffer(physicalDevice, device, swapChain, allocator);
@@ -214,16 +217,16 @@ void DerpRenderer::cleanup()
 
 void DerpRenderer::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
-	auto app = reinterpret_cast<DerpRenderer*>(glfwGetWindowUserPointer(window));
-	app->framebufferResized = true;
+	auto app = reinterpret_cast<Game*>(glfwGetWindowUserPointer(window));
+	app->renderer->framebufferResized = true;
 }
 
-void DerpRenderer::drawFrame()
+void DerpRenderer::drawFrame(Camera* camera)
 {
 	fpsMonitor.update();
-	fpsMonitor.updateWindow(window, 300.0);
-	//if (fpsMonitor.timeSinceUpdate != 0.0)
-	//	return;
+	fpsMonitor.updateWindow(window, 50.0);
+	if (fpsMonitor.timeSinceUpdate != 0.0)
+		return;
 
 	vk::Result result;
 
@@ -273,9 +276,14 @@ void DerpRenderer::drawFrame()
 
 	cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->handle);
 
+	//glm::mat4 model = glm::mat4(1.0f);
 	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
+	//glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
+	//proj[1][1] *= -1;
+	//glm::scale(model, glm::vec3(5.0f, 1.0f, 1.0f));
+	glm::mat4 view = camera->getViewMatrix();
+	glm::mat4 proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
 	proj[1][1] *= -1;
 
 	p4.mvp = proj * view * model;
@@ -291,7 +299,8 @@ void DerpRenderer::drawFrame()
 
 	cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
 
-	cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
+	//cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
+	cmd.draw(vertexBuffer->num, 1, 0, 0);
 
 	cmd.endRenderPass();
 	cmd.end();

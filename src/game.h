@@ -6,14 +6,22 @@
 #include <vulkan/vulkan.hpp>
 
 #include "engine/DerpRenderer.h"
+#include "Input.h"
+#include "Camera.h"
 
 class Game
 {
 public:
     void run();
 
-private:
 	DerpRenderer *renderer;
+	Input *input;
+	Camera *camera;
+
+
+
+private:
+
 
     void mainLoop();
 };

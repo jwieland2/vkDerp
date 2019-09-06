@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\engine\DerpBufferLocal.cpp" />
     <ClCompile Include="src\engine\DerpBufferStaging.cpp" />
     <ClCompile Include="src\engine\DerpBufferUniform.cpp" />
@@ -159,10 +160,12 @@
     <ClCompile Include="src\engine\FpsMonitor.cpp" />
     <ClCompile Include="src\engine\vk_mem_alloc.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\engine\DerpBufferLocal.h" />
     <ClInclude Include="src\engine\DerpBufferStaging.h" />
     <ClInclude Include="src\engine\DerpBufferUniform.h" />
@@ -188,6 +191,7 @@
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\vk_mem_alloc.h" />
     <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\ResourceManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

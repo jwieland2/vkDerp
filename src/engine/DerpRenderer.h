@@ -28,6 +28,8 @@
 #include "DerpCommandBuffer.h"
 #include "DerpSync.h"
 
+#include "../Camera.h"
+
 const int WIDTH = 800;
 const int HEIGHT = 600;
 const int COMMAND_BUFFER_COUNT = 2;
@@ -78,6 +80,6 @@ public:
 	void recreateSwapChain();
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
-	void drawFrame();
+	void drawFrame(Camera* camera);
 };
 
