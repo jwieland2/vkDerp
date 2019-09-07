@@ -294,22 +294,34 @@ void DerpRenderer::drawFrame(Camera* camera)
 	*(uniformBuffer->data) = bufferColor;
 
 	// bind vertex and index Buffers
-	vk::DeviceSize offsets[] = { 0 };
-	std::vector<vk::Buffer> vertexBufferVector;
+	std::vector<vk::DeviceSize> offsets;
+	
+	std::vector<vk::Buffer> buffersToBind;
+	int numVertices = 0;
 
-	for (auto it : vertexBuffers)
-		vertexBufferVector.push_back(it->buffer);
+	for (auto it : localBuffers)
+	{
+		buffersToBind.push_back(it->buffer);
+		offsets.push_back(0);
+		numVertices += it->num;
+	}
 		
-	cmd.bindVertexBuffers(0, 1, vertexBufferVector.data(), offsets);
+	cmd.bindVertexBuffers(0, buffersToBind, offsets);
 	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
 
 	// bind descriptorsets
 	cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
 
 	//cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
+
 	// draw
-	for (auto it : vertexBuffers)
-		cmd.draw(it->num, 1, 0, 0);
+	for (int i = 0, e = localBuffers.size(); i != e; i++)
+	{
+		std::cout << "\tdrawing object #" << i << " with " << localBuffers[i]->num << " vertices" << std::endl;
+		cmd.draw(localBuffers[i]->num, 1, 0, 0);
+	}
+	//std::cout << "\tdrawing object #0 with " << numVertices << " vertices" << std::endl;
+	//cmd.draw(numVertices, 1, 0, 0);
 
 	// end recording
 	cmd.endRenderPass();
@@ -342,9 +354,12 @@ void DerpRenderer::drawFrame(Camera* camera)
 			&imageIndex,
 			nullptr
 		));
+
+	buffersToBind.clear();
+	localBuffers.clear();
 }
 
 void DerpRenderer::addToCommandBuffer(DerpBufferLocal* addBuffer)
 {
-	vertexBuffers.push_back(addBuffer);
+	localBuffers.push_back(addBuffer);
 }

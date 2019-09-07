@@ -19,9 +19,10 @@ public:
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 	void setupCallbacks(GLFWwindow* window);
+	void process(Camera* camera);
 
 	
-	double mouseOffsetX, mouseOffsetY, lastX, lastY, mouseSensitivity = 0.4f;
+	double mouseOffsetX, mouseOffsetY, lastX, lastY, mouseSensitivity = 0.3f;
 	float MovementSpeed = 0.03f;
 	bool firstMouse, constrainPitch;
 	float scrollOffset;

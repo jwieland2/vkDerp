@@ -30,8 +30,8 @@
 
 #include "Camera.h"
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1400;
+const int HEIGHT = 800;
 const int COMMAND_BUFFER_COUNT = 2;
 
 class DerpRenderer
@@ -55,7 +55,6 @@ public:
 	std::unique_ptr<DerpImage> texture;
 	std::unique_ptr<DerpSampler> sampler;
 	std::unique_ptr<DerpImage> depthBuffer;
-	//std::unique_ptr<DerpBufferLocal> vertexBuffer;
 	std::unique_ptr<DerpBufferLocal> indexBuffer;
 	std::unique_ptr<DerpBufferUniform> uniformBuffer;
 	std::unique_ptr<DerpDescriptorPool> descriptorPool;
@@ -63,7 +62,7 @@ public:
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
 
-	std::vector<DerpBufferLocal*> vertexBuffers;
+	std::vector<DerpBufferLocal*> localBuffers;
 
 	mvp4 p4;
 	color bufferColor;
@@ -83,8 +82,6 @@ public:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	void drawFrame(Camera* camera);
-	void beginDraw(Camera* camera);
-	void endDraw();
 	void addToCommandBuffer(DerpBufferLocal* addBuffer);
 };
 

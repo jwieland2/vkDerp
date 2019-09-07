@@ -17,10 +17,7 @@ layout(binding = 0) uniform color {
 } bufferColor;
 
 void main() {
-	if (inColor == vec3(1.0, 0.0, 0.0))
-		fragColor = vec3(bufferColor.uColor.x, bufferColor.uColor.y, bufferColor.uColor.z);
-	else
-		fragColor = inColor;
+
 		
     gl_Position = p4.mvp * vec4(inPosition, 1.0);
 	fragTexCoord = inTexCoord;

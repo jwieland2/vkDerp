@@ -59,8 +59,6 @@ void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	app->input->lastX = xpos;
 	app->input->lastY = ypos;
 
-	std::cout << app->input->mouseOffsetX << " " << app->input->mouseOffsetY << std::endl;
-
 	// mouse pos
 	app->input->mouseOffsetX *= app->input->mouseSensitivity;
 	app->input->mouseOffsetY *= app->input->mouseSensitivity;
@@ -84,4 +82,25 @@ void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		app->camera->fov = 1.0f;
 	if (app->camera->fov >= 45.0f)
 		app->camera->fov = 45.0f;
+}
+
+void Input::process(Camera* camera)
+{
+	float velocity = 0.3f;
+	if (this->keys[GLFW_KEY_W])
+	{
+		camera->position_ += camera->front_ * velocity;
+	}
+	if (this->keys[GLFW_KEY_S])
+	{
+		camera->position_ -= camera->front_ * velocity;
+	}
+	if (this->keys[GLFW_KEY_A])
+	{
+		camera->position_ -= camera->right_ * velocity;
+	}
+	if (this->keys[GLFW_KEY_D])
+	{
+		camera->position_ += camera->right_ * velocity;
+	}
 }

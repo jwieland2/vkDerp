@@ -18,6 +18,9 @@ void Game::run()
 	glfwSetWindowUserPointer(renderer->window, this);
 	input = new Input(renderer);
 
+	vertexObjects.push_back(new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, vertices));
+	vertexObjects.push_back(new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, planeVertices));
+
 	
     mainLoop();
 }
@@ -25,73 +28,15 @@ void Game::run()
 void Game::mainLoop()
 {
 
-	
-
-	std::vector<Vertex> vertices = {
-		// positions          // normals           // texture coords
-
-		{{-0.5f, -0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{0.0f,  0.0f}},
-		{{ 0.5f, -0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{1.0f,  0.0f}},
-		{{ 0.5f,  0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{1.0f,  1.0f}},
-		{{ 0.5f,  0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{1.0f,  1.0f}},
-		{{-0.5f,  0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{0.0f,  1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{0.0f,  0.0f, -1.0f},{0.0f,  0.0f}},
-
-		{{-0.5f, -0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{0.0f,  0.0f}},
-		{{ 0.5f, -0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{1.0f,  0.0f}},
-		{{ 0.5f,  0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{1.0f,  1.0f}},
-		{{ 0.5f,  0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{1.0f,  1.0f}},
-		{{-0.5f,  0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{0.0f,  1.0f}},
-		{{-0.5f, -0.5f,  0.5f},{0.0f,  0.0f,  1.0f},{0.0f,  0.0f}},
-
-		{{-0.5f,  0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  0.0f}},
-		{{-0.5f,  0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  1.0f}},
-		{{-0.5f, -0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  1.0f}},
-		{{-0.5f, -0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  0.0f}},
-		{{-0.5f,  0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  0.0f}},
-
-		{{ 0.5f,  0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  0.0f}},
-		{{ 0.5f,  0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  1.0f}},
-		{{ 0.5f, -0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  1.0f}},
-		{{ 0.5f, -0.5f, -0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  1.0f}},
-		{{ 0.5f, -0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{0.0f,  0.0f}},
-		{{ 0.5f,  0.5f,  0.5f},{1.0f,  0.0f,  0.0f},{1.0f,  0.0f}},
-
-		{{-0.5f, -0.5f, -0.5f},{0.0f, -1.0f,  0.0f},{0.0f,  1.0f}},
-		{{ 0.5f, -0.5f, -0.5f},{0.0f, -1.0f,  0.0f},{1.0f,  1.0f}},
-		{{ 0.5f, -0.5f,  0.5f},{0.0f, -1.0f,  0.0f},{1.0f,  0.0f}},
-		{{ 0.5f, -0.5f,  0.5f},{0.0f, -1.0f,  0.0f},{1.0f,  0.0f}},
-		{{-0.5f, -0.5f,  0.5f},{0.0f, -1.0f,  0.0f},{0.0f,  0.0f}},
-		{{-0.5f, -0.5f, -0.5f},{0.0f, -1.0f,  0.0f},{0.0f,  1.0f}},
-
-		{{-0.5f,  0.5f, -0.5f},{0.0f,  1.0f,  0.0f},{0.0f,  1.0f}},
-		{{ 0.5f,  0.5f, -0.5f},{0.0f,  1.0f,  0.0f},{1.0f,  1.0f}},
-		{{ 0.5f,  0.5f,  0.5f},{0.0f,  1.0f,  0.0f},{1.0f,  0.0f}},
-		{{ 0.5f,  0.5f,  0.5f},{0.0f,  1.0f,  0.0f},{1.0f,  0.0f}},
-		{{-0.5f,  0.5f,  0.5f},{0.0f,  1.0f,  0.0f},{0.0f,  0.0f}},
-		{{-0.5f,  0.5f, -0.5f},{0.0f,  1.0f,  0.0f},{0.0f,  1.0f}}
-	};
-
-	GameObjectVertex cube(renderer->device, renderer->commandPool, renderer->allocator, vertices);
-
-	std::vector<Vertex> planeVertices = {
-		// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-		{{ 5.0f, -0.5f,  5.0f},{0.0f,  1.0f,  0.0f},{  2.0f, 0.0f,}},
-		{{-5.0f, -0.5f,  5.0f},{0.0f,  1.0f,  0.0f},{  0.0f, 0.0f,}},
-		{{-5.0f, -0.5f, -5.0f},{0.0f,  1.0f,  0.0f},{  0.0f, 2.0f,}},
-		{{ 5.0f, -0.5f,  5.0f},{0.0f,  1.0f,  0.0f},{  2.0f, 0.0f,}},
-		{{-5.0f, -0.5f, -5.0f},{0.0f,  1.0f,  0.0f},{  0.0f, 2.0f,}},
-		{{ 5.0f, -0.5f, -5.0f},{0.0f,  1.0f,  0.0f},{  2.0f, 2.0f }}
-	};
-
-	GameObjectVertex floor(renderer->device, renderer->commandPool, renderer->allocator, planeVertices);
 
     while (!glfwWindowShouldClose(renderer->window))
     {
         glfwPollEvents();
-		floor.draw(*renderer);
-		cube.draw(*renderer);
+		input->process(camera);
+		
+		for (auto it : vertexObjects)
+			it->draw(*renderer);
+
         renderer->drawFrame(camera);
 		camera->updateCameraVectors();
     }
