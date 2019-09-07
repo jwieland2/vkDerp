@@ -108,7 +108,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>E:\VisualStudio\opengl\include;E:\VK\1.1.108.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\repos\vkDerp\src;E:\VisualStudio\opengl\include;E:\VK\1.1.108.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -124,7 +124,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>E:\VisualStudio\opengl\include;E:\VK\1.1.108.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\repos\vkDerp\src;E:\VisualStudio\opengl\include;E:\VK\1.1.108.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -160,6 +160,8 @@
     <ClCompile Include="src\engine\FpsMonitor.cpp" />
     <ClCompile Include="src\engine\vk_mem_alloc.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\GameObject.cpp" />
+    <ClCompile Include="src\GameObjectVertex.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
@@ -191,6 +193,8 @@
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\vk_mem_alloc.h" />
     <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\GameObject.h" />
+    <ClInclude Include="src\GameObjectVertex.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\ResourceManager.h" />
   </ItemGroup>

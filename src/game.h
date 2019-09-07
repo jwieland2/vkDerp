@@ -8,17 +8,21 @@
 #include "engine/DerpRenderer.h"
 #include "Input.h"
 #include "Camera.h"
+#include "GameObjectVertex.h"
 
 class Game
 {
 public:
+	Game();
+	~Game();
+
     void run();
+
+	
 
 	DerpRenderer *renderer;
 	Input *input;
 	Camera *camera;
-
-
 
 private:
 

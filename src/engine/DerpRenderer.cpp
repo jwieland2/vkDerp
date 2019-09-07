@@ -1,6 +1,6 @@
 #include "DerpRenderer.h"
 
-#include "../game.h"
+#include "game.h"
 
 
 
@@ -61,14 +61,14 @@ void DerpRenderer::initVulkan()
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture(device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
-	vertexBuffer	= std::make_unique<DerpBufferLocal>(device, commandPool, vertices, allocator);
+	//vertexBuffer	= std::make_unique<DerpBufferLocal>(device, commandPool, vertices, allocator);
 	indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, indices, allocator);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, swapChain, allocator);
 
 	// rendering
 	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
 	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
-	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, swapChain, renderPass, pipeline, commandPool, framebuffers, vertexBuffer, indexBuffer, p4);
+	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers, p4);
 	sync			= std::make_unique<DerpSync>(device);
 }
 
@@ -160,7 +160,7 @@ void DerpRenderer::recreateSwapChain()
 	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
 	//std::cout << "++descriptorSet" << std::endl;
 
-	commandBuffers = std::make_unique<DerpCommandBuffer>(device, swapChain, renderPass, pipeline, commandPool, framebuffers, vertexBuffer, indexBuffer, p4);
+	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers, p4);
 	//std::cout << "++commandbuffers" << std::endl;
 
 	sync = std::make_unique<DerpSync>(device);
@@ -199,8 +199,8 @@ void DerpRenderer::cleanup()
 
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
-	std::cout << "\t--vertex buffer" << std::endl;
-	vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
+	//std::cout << "\t--vertex buffer" << std::endl;
+	//vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
 	std::cout << "\t--index buffer" << std::endl;
 	vmaDestroyBuffer(allocator, indexBuffer->buffer, indexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
@@ -223,6 +223,7 @@ void DerpRenderer::framebufferResizeCallback(GLFWwindow* window, int width, int 
 
 void DerpRenderer::drawFrame(Camera* camera)
 {
+	// calculate framerate
 	fpsMonitor.update();
 	fpsMonitor.updateWindow(window, 50.0);
 	if (fpsMonitor.timeSinceUpdate != 0.0)
@@ -240,11 +241,14 @@ void DerpRenderer::drawFrame(Camera* camera)
 	beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
+
+	// begin recording
 	cmd.begin(beginInfo);
 
 	uint32_t imageIndex = 0;
 	result = device->handle.acquireNextImageKHR(swapChain->handle, std::numeric_limits<uint64_t>::max(), sync->imageAvailableSemaphore, nullptr, &imageIndex);
 
+	// resize check
 	if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR || framebufferResized)
 	{
 		std::cout << "resized!" << std::endl;
@@ -256,8 +260,8 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	}
 
+	// background color
 	std::array<vk::ClearValue, 2> clearValues;
-
 	clearValues[0].color.float32[0] = 0.6f;
 	clearValues[0].color.float32[1] = 0.6f;
 	clearValues[0].color.float32[2] = 0.6f;
@@ -276,37 +280,42 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->handle);
 
-	//glm::mat4 model = glm::mat4(1.0f);
-	glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime() * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//glm::mat4 view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
-	//proj[1][1] *= -1;
-	//glm::scale(model, glm::vec3(5.0f, 1.0f, 1.0f));
+	// view projection matrix
 	glm::mat4 view = camera->getViewMatrix();
 	glm::mat4 proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
 	proj[1][1] *= -1;
 
-	p4.mvp = proj * view * model;
+	// push constants
+	p4.mvp = proj * view;
 	cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4), &p4);
 
-	vk::Buffer vertexBuffers[] = { vertexBuffer->buffer };
-	vk::DeviceSize offsets[] = { 0 };
-	cmd.bindVertexBuffers(0, 1, vertexBuffers, offsets);
-	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
-
+	// update uniforms
 	bufferColor.uColor = glm::vec4(0.5 + 0.5*sin(glfwGetTime()*1.479), 0.5 + 0.5*sin(glfwGetTime()), 0.5 + 0.5*sin(glfwGetTime()*2.3), 1.0f);
 	*(uniformBuffer->data) = bufferColor;
 
+	// bind vertex and index Buffers
+	vk::DeviceSize offsets[] = { 0 };
+	std::vector<vk::Buffer> vertexBufferVector;
+
+	for (auto it : vertexBuffers)
+		vertexBufferVector.push_back(it->buffer);
+		
+	cmd.bindVertexBuffers(0, 1, vertexBufferVector.data(), offsets);
+	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
+
+	// bind descriptorsets
 	cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
 
 	//cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
-	cmd.draw(vertexBuffer->num, 1, 0, 0);
+	// draw
+	for (auto it : vertexBuffers)
+		cmd.draw(it->num, 1, 0, 0);
 
+	// end recording
 	cmd.endRenderPass();
 	cmd.end();
 
-
-
+	// submit to queue
 	vk::PipelineStageFlags waitStages = vk::PipelineStageFlagBits::eColorAttachmentOutput;
 
 	vk::SubmitInfo submitInfo(
@@ -323,6 +332,7 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	result = device->graphicsQueue.submit(1, &submitInfo, sync->inFlightFences[cmdIndex]);
 
+	// present
 	result = device->presentQueue.presentKHR(
 		vk::PresentInfoKHR(
 			1,
@@ -332,4 +342,9 @@ void DerpRenderer::drawFrame(Camera* camera)
 			&imageIndex,
 			nullptr
 		));
+}
+
+void DerpRenderer::addToCommandBuffer(DerpBufferLocal* addBuffer)
+{
+	vertexBuffers.push_back(addBuffer);
 }
