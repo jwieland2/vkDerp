@@ -34,7 +34,7 @@ void FpsMonitor::update()
 void FpsMonitor::updateWindow(GLFWwindow* window, double d)
 {
 	
-	if (timeSinceUpdate < d && limit)
+	if (timeSinceUpdate < d)
 		timeSinceUpdate += dt;
 	else
 	{

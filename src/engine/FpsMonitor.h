@@ -22,6 +22,5 @@ public:
 	double glfwdt, glfwTimeSinceUpdate;
 	double loss = 0.0;
 	double glfwloss = 0.0;
-	bool limit = false;
 };
 

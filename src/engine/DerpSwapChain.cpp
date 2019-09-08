@@ -34,6 +34,8 @@ DerpSwapChain::DerpSwapChain(GLFWwindow* window,
         }
     }
 
+	presentMode = vk::PresentModeKHR::eImmediate;
+
     // choose swap extent
 	std::cout << "\tminImageCount= " << support.capabilities.minImageCount << std::endl <<
 		"\tmaxImageCount= " << support.capabilities.maxImageCount << std::endl <<

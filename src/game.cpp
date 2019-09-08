@@ -18,10 +18,22 @@ void Game::run()
 	glfwSetWindowUserPointer(renderer->window, this);
 	input = new Input(renderer);
 
-	vertexObjects.push_back(new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, vertices));
-	vertexObjects.push_back(new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, planeVertices));
+	cube = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, vertices);
+	floor = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, planeVertices);
 
-	
+	vertexObjects.push_back(cube);
+	vertexObjects.push_back(floor);
+
+	std::vector<Vertex> data;
+
+	for (auto it : vertexObjects)
+	{
+		data.insert(data.end(), it->vertices_.begin(), it->vertices_.end());
+	}
+
+	renderer->vertexBuffer.reset();
+	renderer->vertexBuffer = std::make_unique<DerpBufferLocal>(renderer->device, renderer->commandPool, data, renderer->allocator);
+
     mainLoop();
 }
 
@@ -32,10 +44,7 @@ void Game::mainLoop()
     while (!glfwWindowShouldClose(renderer->window))
     {
         glfwPollEvents();
-		input->process(camera);
-		
-		for (auto it : vertexObjects)
-			it->draw(*renderer);
+		input->process(camera, renderer->fpsMonitor.dt);
 
         renderer->drawFrame(camera);
 		camera->updateCameraVectors();

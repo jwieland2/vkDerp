@@ -21,7 +21,5 @@ public:
 	GameObjectVertex(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator, std::vector<Vertex> vertices);
 	~GameObjectVertex();
 
-	void draw(DerpRenderer &renderer);
-
-	std::unique_ptr<DerpBufferLocal> vertexBuffer;
+	std::vector<Vertex> vertices_;
 };

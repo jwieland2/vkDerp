@@ -30,6 +30,7 @@
 
 #include "Camera.h"
 
+
 const int WIDTH = 1400;
 const int HEIGHT = 800;
 const int COMMAND_BUFFER_COUNT = 2;
@@ -62,7 +63,7 @@ public:
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
 
-	std::vector<DerpBufferLocal*> localBuffers;
+	std::unique_ptr<DerpBufferLocal> vertexBuffer;
 
 	mvp4 p4;
 	color bufferColor;
@@ -82,6 +83,5 @@ public:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	void drawFrame(Camera* camera);
-	void addToCommandBuffer(DerpBufferLocal* addBuffer);
 };
 

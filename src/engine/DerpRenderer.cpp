@@ -199,8 +199,8 @@ void DerpRenderer::cleanup()
 
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
-	//std::cout << "\t--vertex buffer" << std::endl;
-	//vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
+	std::cout << "\t--vertex buffer" << std::endl;
+	vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
 	std::cout << "\t--index buffer" << std::endl;
 	vmaDestroyBuffer(allocator, indexBuffer->buffer, indexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
@@ -225,9 +225,9 @@ void DerpRenderer::drawFrame(Camera* camera)
 {
 	// calculate framerate
 	fpsMonitor.update();
-	fpsMonitor.updateWindow(window, 50.0);
-	if (fpsMonitor.timeSinceUpdate != 0.0)
-		return;
+	fpsMonitor.updateWindow(window, 150.0);
+	//if (fpsMonitor.timeSinceUpdate != 0.0)
+	//	return;
 
 	vk::Result result;
 
@@ -294,19 +294,9 @@ void DerpRenderer::drawFrame(Camera* camera)
 	*(uniformBuffer->data) = bufferColor;
 
 	// bind vertex and index Buffers
-	std::vector<vk::DeviceSize> offsets;
-	
-	std::vector<vk::Buffer> buffersToBind;
-	int numVertices = 0;
-
-	for (auto it : localBuffers)
-	{
-		buffersToBind.push_back(it->buffer);
-		offsets.push_back(0);
-		numVertices += it->num;
-	}
+	std::vector<vk::DeviceSize> offsets = { 0 };
 		
-	cmd.bindVertexBuffers(0, buffersToBind, offsets);
+	cmd.bindVertexBuffers(0, vertexBuffer->buffer, offsets);
 	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
 
 	// bind descriptorsets
@@ -314,14 +304,7 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	//cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
 
-	// draw
-	for (int i = 0, e = localBuffers.size(); i != e; i++)
-	{
-		std::cout << "\tdrawing object #" << i << " with " << localBuffers[i]->num << " vertices" << std::endl;
-		cmd.draw(localBuffers[i]->num, 1, 0, 0);
-	}
-	//std::cout << "\tdrawing object #0 with " << numVertices << " vertices" << std::endl;
-	//cmd.draw(numVertices, 1, 0, 0);
+	cmd.draw(vertexBuffer->num, 1, 0, 0);
 
 	// end recording
 	cmd.endRenderPass();
@@ -354,12 +337,4 @@ void DerpRenderer::drawFrame(Camera* camera)
 			&imageIndex,
 			nullptr
 		));
-
-	buffersToBind.clear();
-	localBuffers.clear();
-}
-
-void DerpRenderer::addToCommandBuffer(DerpBufferLocal* addBuffer)
-{
-	localBuffers.push_back(addBuffer);
 }
