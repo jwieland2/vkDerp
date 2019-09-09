@@ -21,7 +21,6 @@
 #include "DerpBufferLocal.h"
 #include "DerpImage.h"
 #include "DerpSampler.h"
-//#include "DerpStagedBuffer.h"
 #include "DerpBufferUniform.h"
 #include "DerpDescriptorPool.h"
 #include "DerpDescriptorSet.h"
@@ -63,9 +62,14 @@ public:
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
 
+	vk::CommandBuffer cmd;
 	std::unique_ptr<DerpBufferLocal> vertexBuffer;
+	size_t cmdIndex;
+	uint32_t imageIndex;
 
-	mvp4 p4;
+	glm::mat4 viewproj;
+
+	mvp4 matrixToPush;
 	color bufferColor;
 
 	bool framebufferResized = false;
@@ -83,5 +87,8 @@ public:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	void drawFrame(Camera* camera);
+	void beginDraw(Camera* camera);
+	void drawObject(glm::mat4 model);
+	void endDraw();
 };
 

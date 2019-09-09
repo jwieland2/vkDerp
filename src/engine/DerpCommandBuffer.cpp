@@ -5,8 +5,7 @@
 DerpCommandBuffer::DerpCommandBuffer(
 	std::unique_ptr<DerpDevice>& device,
 	std::unique_ptr<DerpCommandPool>& commandPool,
-	std::unique_ptr<DerpFramebuffers>& framebuffers,
-	mvp4 &m)
+	std::unique_ptr<DerpFramebuffers>& framebuffers)
 {
 	std::cout << "create commandBuffers" << std::endl;
 

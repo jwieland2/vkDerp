@@ -7,7 +7,6 @@
 DerpRenderer::DerpRenderer()
 {
 	initWindow();
-	//fpsMonitor = FpsMonitor();
 	initVulkan();
 }
 
@@ -61,14 +60,13 @@ void DerpRenderer::initVulkan()
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture(device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
-	//vertexBuffer	= std::make_unique<DerpBufferLocal>(device, commandPool, vertices, allocator);
 	indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, indices, allocator);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, swapChain, allocator);
 
 	// rendering
 	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
 	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
-	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers, p4);
+	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
 	sync			= std::make_unique<DerpSync>(device);
 }
 
@@ -160,7 +158,7 @@ void DerpRenderer::recreateSwapChain()
 	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
 	//std::cout << "++descriptorSet" << std::endl;
 
-	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers, p4);
+	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
 	//std::cout << "++commandbuffers" << std::endl;
 
 	sync = std::make_unique<DerpSync>(device);
@@ -221,7 +219,7 @@ void DerpRenderer::framebufferResizeCallback(GLFWwindow* window, int width, int 
 	app->renderer->framebufferResized = true;
 }
 
-void DerpRenderer::drawFrame(Camera* camera)
+void DerpRenderer::beginDraw(Camera* camera)
 {
 	// calculate framerate
 	fpsMonitor.update();
@@ -231,8 +229,8 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	vk::Result result;
 
-	size_t cmdIndex = (nextCommandBufferIndex++) % sync->maxFramesInFlight;
-	vk::CommandBuffer cmd = commandBuffers->handles[cmdIndex];
+	cmdIndex = (nextCommandBufferIndex++) % sync->maxFramesInFlight;
+	cmd = commandBuffers->handles[cmdIndex];
 
 	device->handle.waitForFences(1, &sync->inFlightFences[cmdIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
@@ -245,7 +243,7 @@ void DerpRenderer::drawFrame(Camera* camera)
 	// begin recording
 	cmd.begin(beginInfo);
 
-	uint32_t imageIndex = 0;
+	imageIndex = 0;
 	result = device->handle.acquireNextImageKHR(swapChain->handle, std::numeric_limits<uint64_t>::max(), sync->imageAvailableSemaphore, nullptr, &imageIndex);
 
 	// resize check
@@ -280,32 +278,33 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->handle);
 
-	// view projection matrix
-	glm::mat4 view = camera->getViewMatrix();
-	glm::mat4 proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
-	proj[1][1] *= -1;
-
-	// push constants
-	p4.mvp = proj * view;
-	cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4), &p4);
-
-	// update uniforms
-	bufferColor.uColor = glm::vec4(0.5 + 0.5*sin(glfwGetTime()*1.479), 0.5 + 0.5*sin(glfwGetTime()), 0.5 + 0.5*sin(glfwGetTime()*2.3), 1.0f);
-	*(uniformBuffer->data) = bufferColor;
-
-	// bind vertex and index Buffers
-	std::vector<vk::DeviceSize> offsets = { 0 };
-		
-	cmd.bindVertexBuffers(0, vertexBuffer->buffer, offsets);
-	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
-
 	// bind descriptorsets
 	cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
 
-	//cmd.drawIndexed(indexBuffer->num, 1, 0, 0, 0);	// indexed vertices
+	// bind vertex and index Buffers
+	std::vector<vk::DeviceSize> offsets = { 0 };
+	cmd.bindVertexBuffers(0, vertexBuffer->buffer, offsets);
+	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
+
+	// view projection matrix
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 proj = glm::mat4(1.0f);
+	view = camera->getViewMatrix();
+	proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
+	proj[1][1] *= -1;
+	viewproj = proj * view;
+}
+
+void DerpRenderer::drawObject(glm::mat4 model)
+{
+	matrixToPush.mvp = viewproj * model;
+	cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
 
 	cmd.draw(vertexBuffer->num, 1, 0, 0);
+}
 
+void DerpRenderer::endDraw()
+{
 	// end recording
 	cmd.endRenderPass();
 	cmd.end();
@@ -325,7 +324,7 @@ void DerpRenderer::drawFrame(Camera* camera)
 
 	device->handle.resetFences(1, &sync->inFlightFences[cmdIndex]);
 
-	result = device->graphicsQueue.submit(1, &submitInfo, sync->inFlightFences[cmdIndex]);
+	vk::Result result = device->graphicsQueue.submit(1, &submitInfo, sync->inFlightFences[cmdIndex]);
 
 	// present
 	result = device->presentQueue.presentKHR(
@@ -337,4 +336,6 @@ void DerpRenderer::drawFrame(Camera* camera)
 			&imageIndex,
 			nullptr
 		));
+
+	cmd.reset({});
 }

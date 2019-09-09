@@ -46,7 +46,19 @@ void Game::mainLoop()
         glfwPollEvents();
 		input->process(camera, renderer->fpsMonitor.dt);
 
-        renderer->drawFrame(camera);
+		renderer->beginDraw(camera);
+
+		for (int i = 0; i < vertexObjects.size(); i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			if (i)
+				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime()*50), 0.0f, 0.0f);
+			else
+				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime() * -50), 0.0f, 0.0f);
+			renderer->drawObject(model);
+		}
+
+        renderer->endDraw();
 		camera->updateCameraVectors();
     }
 

@@ -25,9 +25,6 @@ public:
 		std::unique_ptr<DerpSampler>& sampler);
 	~DerpDescriptorSet();
 
-	//void update(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpBufferUniform>& derpBufferUniform);
-
-	//std::vector<vk::DescriptorSet> handle;
 	vk::DescriptorSet handle;
 
 	vk::DescriptorBufferInfo uniformDescriptor;

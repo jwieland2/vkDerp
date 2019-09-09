@@ -5,6 +5,11 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
+
 #include "engine/DerpRenderer.h"
 #include "Input.h"
 #include "Camera.h"
