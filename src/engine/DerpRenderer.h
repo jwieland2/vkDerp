@@ -88,7 +88,7 @@ public:
 
 	void drawFrame(Camera* camera);
 	void beginDraw(Camera* camera);
-	void drawObject(glm::mat4 model);
+	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer);
 	void endDraw();
 };
 

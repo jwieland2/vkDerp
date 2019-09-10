@@ -295,12 +295,21 @@ void DerpRenderer::beginDraw(Camera* camera)
 	viewproj = proj * view;
 }
 
-void DerpRenderer::drawObject(glm::mat4 model)
+void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer)
 {
+	//matrixToPush.mvp = viewproj * model;
+	//cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
+
+	//cmd.draw(vertexBuffer->num, 1, 0, 0);
+
+
+
 	matrixToPush.mvp = viewproj * model;
 	cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
 
-	cmd.draw(vertexBuffer->num, 1, 0, 0);
+	std::vector<vk::Buffer> buf = { inBuffer->buffer };
+	cmd.bindVertexBuffers(0, buf, { 0 });
+	cmd.draw(inBuffer->num, 1, 0, 0);
 }
 
 void DerpRenderer::endDraw()
@@ -336,6 +345,4 @@ void DerpRenderer::endDraw()
 			&imageIndex,
 			nullptr
 		));
-
-	cmd.reset({});
 }

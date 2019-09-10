@@ -22,4 +22,8 @@ public:
 	~GameObjectVertex();
 
 	std::vector<Vertex> vertices_;
+	int num;
+	std::unique_ptr<DerpBufferLocal> objVertexBuffer;
+	vk::DeviceSize offset;
+	VmaAllocator* alloc;
 };

@@ -55,7 +55,8 @@ void Game::mainLoop()
 				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime()*50), 0.0f, 0.0f);
 			else
 				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime() * -50), 0.0f, 0.0f);
-			renderer->drawObject(model);
+
+			renderer->drawObject(model, vertexObjects[i]->objVertexBuffer.get());
 		}
 
         renderer->endDraw();
@@ -63,6 +64,8 @@ void Game::mainLoop()
     }
 
     renderer->device->handle.waitIdle();
+	for (auto o : vertexObjects)
+		delete o;
 	delete renderer;
 }
 
