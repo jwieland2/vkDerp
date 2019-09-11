@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include "data.h"
+
 Game::Game()
 {
 
@@ -18,21 +20,11 @@ void Game::run()
 	glfwSetWindowUserPointer(renderer->window, this);
 	input = new Input(renderer);
 
-	cube = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, vertices);
+	cube = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, cubeVertices);
 	floor = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, planeVertices);
 
 	vertexObjects.push_back(cube);
 	vertexObjects.push_back(floor);
-
-	std::vector<Vertex> data;
-
-	for (auto it : vertexObjects)
-	{
-		data.insert(data.end(), it->vertices_.begin(), it->vertices_.end());
-	}
-
-	renderer->vertexBuffer.reset();
-	renderer->vertexBuffer = std::make_unique<DerpBufferLocal>(renderer->device, renderer->commandPool, data, renderer->allocator);
 
     mainLoop();
 }
@@ -50,7 +42,7 @@ void Game::mainLoop()
 
 		for (int i = 0; i < vertexObjects.size(); i++)
 		{
-			glm::mat4 model = glm::mat4(1.0f);
+			glm::mat4 model = vertexObjects[i]->model;
 			if (i)
 				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime()*50), 0.0f, 0.0f);
 			else

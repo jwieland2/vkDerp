@@ -203,5 +203,8 @@
     <ClInclude Include="src\GameObjectVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\data.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

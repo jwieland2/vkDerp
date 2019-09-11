@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\data.h" />
     <ClInclude Include="src\engine\DerpBufferLocal.h" />
     <ClInclude Include="src\engine\DerpBufferStaging.h" />
     <ClInclude Include="src\engine\DerpBufferUniform.h" />

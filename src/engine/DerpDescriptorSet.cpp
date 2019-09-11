@@ -28,7 +28,7 @@ DerpDescriptorSet::DerpDescriptorSet(
 		uniformDescriptor = vk::DescriptorBufferInfo()
 			.setBuffer(derpBufferUniform->uniformBuffers[0])
 			.setOffset(0)
-			.setRange(sizeof(color));
+			.setRange(sizeof(ubo));
 
 		imageDescriptor = vk::DescriptorImageInfo()
 			.setSampler(sampler->handle)

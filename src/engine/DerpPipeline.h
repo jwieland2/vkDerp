@@ -10,7 +10,6 @@
 #include "DerpSwapChain.h"
 #include "DerpRenderPass.h"
 #include "DerpDescriptorSetLayout.h"
-//#include "ResourceManager.h"
 
 class DerpPipeline
 {

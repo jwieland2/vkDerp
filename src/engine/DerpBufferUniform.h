@@ -16,13 +16,13 @@
 class DerpBufferUniform
 {
 public:
-	DerpBufferUniform(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpSwapChain>& swapChain, VmaAllocator& allocator);
+	DerpBufferUniform(std::unique_ptr<DerpDevice>& device, VmaAllocator& allocator);
 	~DerpBufferUniform();
 
 	std::vector<vk::Buffer> uniformBuffers;
 	VmaAllocation bufferAllocation;
 
 	VmaAllocationInfo uniformBufferAllocInfo = {};
-	color *data;
+	ubo *data;
 };
 

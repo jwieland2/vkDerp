@@ -2,10 +2,10 @@
 
 
 
-DerpBufferUniform::DerpBufferUniform(std::unique_ptr<DerpDevice> & device, std::unique_ptr<DerpSwapChain>& swapChain, VmaAllocator& allocator)
+DerpBufferUniform::DerpBufferUniform(std::unique_ptr<DerpDevice> & device, VmaAllocator& allocator)
 {
 	std::cout << "create uniform buffer" << std::endl;
-	vk::DeviceSize bufferSize = sizeof(color);
+	vk::DeviceSize bufferSize = sizeof(ubo);
 
     uniformBuffers.resize(1);
 
@@ -23,7 +23,7 @@ DerpBufferUniform::DerpBufferUniform(std::unique_ptr<DerpDevice> & device, std::
 
 	vmaCreateBuffer(allocator, (VkBufferCreateInfo*)&ci, &allocCreateInfo, (VkBuffer*)&(uniformBuffers[0]), &bufferAllocation, &uniformBufferAllocInfo);
 
-	data = (color*)uniformBufferAllocInfo.pMappedData;
+	data = (ubo*)uniformBufferAllocInfo.pMappedData;
 }
 
 

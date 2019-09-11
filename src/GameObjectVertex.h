@@ -19,11 +19,11 @@ class GameObjectVertex : public GameObject
 {
 public:
 	GameObjectVertex(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator, std::vector<Vertex> vertices);
+	GameObjectVertex(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
 	~GameObjectVertex();
 
-	std::vector<Vertex> vertices_;
-	int num;
 	std::unique_ptr<DerpBufferLocal> objVertexBuffer;
-	vk::DeviceSize offset;
+	std::unique_ptr<DerpBufferLocal> objIndexBuffer;
 	VmaAllocator* alloc;
+	int numVertices = 0, numIndices = 0;
 };

@@ -2,6 +2,8 @@
 
 #include "game.h"
 
+//#include "data.h"
+
 
 
 DerpRenderer::DerpRenderer()
@@ -60,8 +62,8 @@ void DerpRenderer::initVulkan()
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture(device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
-	indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, indices, allocator);
-	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, swapChain, allocator);
+	//indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, allocator);
+	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, allocator);
 
 	// rendering
 	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
@@ -137,32 +139,32 @@ void DerpRenderer::recreateSwapChain()
 	device->handle.waitIdle();
 
 	swapChain = std::make_unique<DerpSwapChain>(window, surface, physicalDevice, device);
-	//std::cout << "++swapchain" << std::endl;
+	std::cout << "\t++swapchain" << std::endl;
 
 	renderPass = std::make_unique<DerpRenderPass>(device, swapChain);
-	//std::cout << "++renderpass" << std::endl;
+	std::cout << "\t++renderpass" << std::endl;
 
 	pipeline = std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
-	//std::cout << "++pipeline" << std::endl;
+	std::cout << "\t++pipeline" << std::endl;
 
 	depthBuffer = std::make_unique<DerpImage>();
 	depthBuffer->createDepthBuffer(physicalDevice, device, swapChain, allocator);
-	//std::cout << "++depthBuffer" << std::endl;
+	std::cout << "\t++depthBuffer" << std::endl;
 
 	framebuffers = std::make_unique<DerpFramebuffers>(device, swapChain, depthBuffer, renderPass);
-	//std::cout << "++framebuffers" << std::endl;
+	std::cout << "\t++framebuffers" << std::endl;
 
 	descriptorPool = std::make_unique<DerpDescriptorPool>(device, swapChain);
-	//std::cout << "++descriptorPool" << std::endl;
+	std::cout << "\t++descriptorPool" << std::endl;
 
 	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
-	//std::cout << "++descriptorSet" << std::endl;
+	std::cout << "\t++descriptorSet" << std::endl;
 
 	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
-	//std::cout << "++commandbuffers" << std::endl;
+	std::cout << "\t++commandbuffers" << std::endl;
 
 	sync = std::make_unique<DerpSync>(device);
-	//std::cout << "++sync" << std::endl;
+	std::cout << "\t++sync" << std::endl;
 }
 
 void DerpRenderer::cleanup()
@@ -197,10 +199,6 @@ void DerpRenderer::cleanup()
 
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
-	std::cout << "\t--vertex buffer" << std::endl;
-	vmaDestroyBuffer(allocator, vertexBuffer->buffer, vertexBuffer->allocation);
-	std::cout << "\t--index buffer" << std::endl;
-	vmaDestroyBuffer(allocator, indexBuffer->buffer, indexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
 	vmaDestroyBuffer(allocator, uniformBuffer->uniformBuffers[0], uniformBuffer->bufferAllocation);
 	std::cout << "\t--allocator" << std::endl;
@@ -230,7 +228,7 @@ void DerpRenderer::beginDraw(Camera* camera)
 	vk::Result result;
 
 	cmdIndex = (nextCommandBufferIndex++) % sync->maxFramesInFlight;
-	cmd = commandBuffers->handles[cmdIndex];
+	cmd = &(commandBuffers->handles[cmdIndex]);
 
 	device->handle.waitForFences(1, &sync->inFlightFences[cmdIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
@@ -241,7 +239,7 @@ void DerpRenderer::beginDraw(Camera* camera)
 
 
 	// begin recording
-	cmd.begin(beginInfo);
+	cmd->begin(beginInfo);
 
 	imageIndex = 0;
 	result = device->handle.acquireNextImageKHR(swapChain->handle, std::numeric_limits<uint64_t>::max(), sync->imageAvailableSemaphore, nullptr, &imageIndex);
@@ -274,49 +272,40 @@ void DerpRenderer::beginDraw(Camera* camera)
 	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
 
-	cmd.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+	cmd->beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
-	cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->handle);
+	cmd->bindPipeline(vk::PipelineBindPoint::eGraphics, pipeline->handle);
 
 	// bind descriptorsets
-	cmd.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
+	cmd->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, pipeline->layout, 0, 1, &descriptorSet->handle, 0, nullptr);
 
-	// bind vertex and index Buffers
-	std::vector<vk::DeviceSize> offsets = { 0 };
-	cmd.bindVertexBuffers(0, vertexBuffer->buffer, offsets);
-	cmd.bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
+	//cmd->bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
 
 	// view projection matrix
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 proj = glm::mat4(1.0f);
-	view = camera->getViewMatrix();
-	proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
+	glm::mat4 view = camera->getViewMatrix();
+	glm::mat4 proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
 	proj[1][1] *= -1;
 	viewproj = proj * view;
 }
 
 void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer)
 {
-	//matrixToPush.mvp = viewproj * model;
-	//cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
-
-	//cmd.draw(vertexBuffer->num, 1, 0, 0);
-
-
-
 	matrixToPush.mvp = viewproj * model;
-	cmd.pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
+	cmd->pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
 
 	std::vector<vk::Buffer> buf = { inBuffer->buffer };
-	cmd.bindVertexBuffers(0, buf, { 0 });
-	cmd.draw(inBuffer->num, 1, 0, 0);
+	cmd->bindVertexBuffers(0, buf, { 0 });
+
+	// todo:: bind index buffer
+
+	cmd->draw(inBuffer->num, 1, 0, 0);
 }
 
 void DerpRenderer::endDraw()
 {
 	// end recording
-	cmd.endRenderPass();
-	cmd.end();
+	cmd->endRenderPass();
+	cmd->end();
 
 	// submit to queue
 	vk::PipelineStageFlags waitStages = vk::PipelineStageFlagBits::eColorAttachmentOutput;

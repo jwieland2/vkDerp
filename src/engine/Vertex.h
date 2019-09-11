@@ -11,7 +11,7 @@
 
 struct Vertex {
 	glm::vec3 pos;
-	glm::vec3 color;
+	glm::vec3 normal;
 	glm::vec2 texCoord;
 
 	static vk::VertexInputBindingDescription getBindingDescription() {
@@ -28,7 +28,7 @@ struct Vertex {
 		attributeDescriptions[1].binding = 0;
 		attributeDescriptions[1].location = 1;
 		attributeDescriptions[1].format = vk::Format::eR32G32B32Sfloat;
-		attributeDescriptions[1].offset = offsetof(Vertex, color);
+		attributeDescriptions[1].offset = offsetof(Vertex, normal);
 		attributeDescriptions[2].binding = 0;
 		attributeDescriptions[2].location = 2;
 		attributeDescriptions[2].format = vk::Format::eR32G32Sfloat;
@@ -37,18 +37,16 @@ struct Vertex {
 	}
 };
 
-const std::vector<uint16_t> indices = {
-	0, 1, 2, 2, 3, 0,
-	4, 5, 6, 6, 7, 4
-};
-
-
 struct mvp4 {
 	glm::mat4 mvp;
 };
 
-struct color {
-	glm::vec4 uColor;
+//struct color {
+//	glm::vec4 uColor;
+//};
+
+struct ubo {
+	glm::vec4 dummy;
 };
 
 template <typename T>
