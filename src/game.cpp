@@ -20,11 +20,13 @@ void Game::run()
 	glfwSetWindowUserPointer(renderer->window, this);
 	input = new Input(renderer);
 
-	cube = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, cubeVertices);
+	//cube = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, cubeVertices);
 	floor = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, planeVertices);
+	square = new GameObjectVertex(renderer->device, renderer->commandPool, renderer->allocator, squareVertices, squareIndices);
 
-	vertexObjects.push_back(cube);
+	//vertexObjects.push_back(cube);
 	vertexObjects.push_back(floor);
+	vertexObjects.push_back(square);
 
     mainLoop();
 }
@@ -48,7 +50,10 @@ void Game::mainLoop()
 			else
 				model *= glm::yawPitchRoll((float)glm::radians(glfwGetTime() * -50), 0.0f, 0.0f);
 
-			renderer->drawObject(model, vertexObjects[i]->objVertexBuffer.get());
+			if (vertexObjects[i]->numIndices)
+				renderer->drawObject(model, vertexObjects[i]->objVertexBuffer.get(), vertexObjects[i]->objIndexBuffer.get());
+			else
+				renderer->drawObject(model, vertexObjects[i]->objVertexBuffer.get());
 		}
 
         renderer->endDraw();

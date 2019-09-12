@@ -64,4 +64,17 @@ std::vector<Vertex> planeVertices = {
 	{{ 5.0f, -0.5f, -5.0f},{0.0f,  1.0f,  0.0f},{  2.0f, 2.0f }}
 };
 
+std::vector<Vertex> squareVertices = {
+	// positions          // colors           // texture coords
+	{{ 0.5f,  0.5f, 0.0f},{   1.0f, 0.0f, 0.0f},{   1.0f, 1.0f}}, // top right
+	{{ 0.5f, -0.5f, 0.0f},{   0.0f, 1.0f, 0.0f},{   1.0f, 0.0f}}, // bottom right
+	{{-0.5f, -0.5f, 0.0f},{   0.0f, 0.0f, 1.0f},{   0.0f, 0.0f}}, // bottom left
+	{{-0.5f,  0.5f, 0.0f},{   1.0f, 1.0f, 0.0f},{   0.0f, 1.0f}}  // top left 
+};
+
+std::vector<uint16_t> squareIndices = {
+	0, 1, 3, // first triangle
+	1, 2, 3  // second triangle
+};
+
 #endif // DATA_H

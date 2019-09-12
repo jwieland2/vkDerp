@@ -46,7 +46,7 @@ struct mvp4 {
 //};
 
 struct ubo {
-	glm::vec4 dummy;
+	glm::mat4 dummy = glm::mat4(1.0f);
 };
 
 template <typename T>

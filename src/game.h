@@ -31,6 +31,7 @@ public:
 
 	GameObjectVertex* cube;
 	GameObjectVertex* floor;
+	GameObjectVertex* square;
 
 private:
 

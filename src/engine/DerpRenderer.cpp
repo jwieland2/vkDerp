@@ -62,7 +62,6 @@ void DerpRenderer::initVulkan()
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture(device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
-	//indexBuffer		= std::make_unique<DerpBufferLocal>(device, commandPool, allocator);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, allocator);
 
 	// rendering
@@ -252,6 +251,8 @@ void DerpRenderer::beginDraw(Camera* camera)
 		cleanupSwapChain();
 		recreateSwapChain();
 		device->handle.waitIdle();
+		nextCommandBufferIndex = 0;
+		imageIndex = 0;
 		return;
 
 	}
@@ -288,6 +289,7 @@ void DerpRenderer::beginDraw(Camera* camera)
 	viewproj = proj * view;
 }
 
+// draw simple vertices
 void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer)
 {
 	matrixToPush.mvp = viewproj * model;
@@ -296,9 +298,21 @@ void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer)
 	std::vector<vk::Buffer> buf = { inBuffer->buffer };
 	cmd->bindVertexBuffers(0, buf, { 0 });
 
-	// todo:: bind index buffer
-
 	cmd->draw(inBuffer->num, 1, 0, 0);
+}
+
+
+// indexed vertex drawing
+void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer, DerpBufferLocal* indexBuffer)
+{
+	matrixToPush.mvp = viewproj * model;
+	cmd->pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
+
+	std::vector<vk::Buffer> vertex = { inBuffer->buffer };
+	cmd->bindVertexBuffers(0, vertex, { 0 });
+	cmd->bindIndexBuffer(indexBuffer->buffer, 0, vk::IndexType::eUint16);
+
+	cmd->drawIndexed(indexBuffer->num, 1, 0, 0, 0);
 }
 
 void DerpRenderer::endDraw()

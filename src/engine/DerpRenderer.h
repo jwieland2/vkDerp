@@ -55,7 +55,6 @@ public:
 	std::unique_ptr<DerpImage> texture;
 	std::unique_ptr<DerpSampler> sampler;
 	std::unique_ptr<DerpImage> depthBuffer;
-	//std::unique_ptr<DerpBufferLocal> indexBuffer;
 	std::unique_ptr<DerpBufferUniform> uniformBuffer;
 	std::unique_ptr<DerpDescriptorPool> descriptorPool;
 	std::unique_ptr<DerpDescriptorSet> descriptorSet;
@@ -85,5 +84,6 @@ public:
 
 	void beginDraw(Camera* camera);
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer);
+	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer, DerpBufferLocal* indexBuffer);
 	void endDraw();
 };

@@ -62,7 +62,7 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
         &colorBlendAttachment
     );
 
-	vk::PushConstantRange pushRange(vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4));
+	vk::PushConstantRange pushRange(vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4));
 
 	//vk::PipelineLayoutCreateInfo plci({}, 0, nullptr, 1, &pushRange);	// push only
 	//vk::PipelineLayoutCreateInfo plci({}, 1, &descriptorSetLayout->handle, 0, nullptr);	// uniform only
