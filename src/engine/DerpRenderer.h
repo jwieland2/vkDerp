@@ -28,7 +28,9 @@
 #include "DerpSync.h"
 
 #include "Camera.h"
+#include "frustum.hpp"
 
+//#include <stb/stb_image.h>
 
 const int WIDTH = 1400;
 const int HEIGHT = 800;
@@ -61,6 +63,9 @@ public:
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
 
+	std::unique_ptr<DerpBufferLocal> terrainVertexBuffer;
+	std::unique_ptr<DerpBufferLocal> terrainIndexBuffer;
+
 	// drawing
 	vk::CommandBuffer* cmd;
 	size_t nextCommandBufferIndex = 0;
@@ -68,6 +73,9 @@ public:
 	uint32_t imageIndex;
 	glm::mat4 viewproj;
 	mvp4 matrixToPush;
+
+	UBO uboTess;
+	Frustum frustum;
 
 	bool framebufferResized = false;
 
@@ -86,4 +94,9 @@ public:
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer);
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer, DerpBufferLocal* indexBuffer);
 	void endDraw();
+
+	void generateTerrain();
+	//void updateUniformBuffers();
+
+
 };

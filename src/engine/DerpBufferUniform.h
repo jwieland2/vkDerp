@@ -23,6 +23,6 @@ public:
 	VmaAllocation bufferAllocation;
 
 	VmaAllocationInfo uniformBufferAllocInfo = {};
-	ubo *data;
+	UBO *data;
 };
 

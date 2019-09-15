@@ -60,7 +60,7 @@ void Input::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	app->camera->yaw_ += ((xpos - app->input->lastX) * app->input->mouseSensitivity);
-	app->camera->pitch_ += ((app->input->lastY - ypos) * app->input->mouseSensitivity);
+	app->camera->pitch_ -= ((app->input->lastY - ypos) * app->input->mouseSensitivity);
 
 	app->input->lastX = xpos;
 	app->input->lastY = ypos;

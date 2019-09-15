@@ -77,4 +77,6 @@ std::vector<uint16_t> squareIndices = {
 	1, 2, 3  // second triangle
 };
 
+
+
 #endif // DATA_H

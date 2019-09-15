@@ -2,8 +2,56 @@
 
 #include "game.h"
 
+#include <stb/stb_image.h>
+
 //#include "data.h"
 
+// Encapsulate height map data for easy sampling
+struct HeightMap
+{
+private:
+	uint8_t *heightdata;
+	uint32_t dim;
+	uint32_t scale;
+	int texWidth, texHeight, texChannels;
+public:
+	HeightMap(std::string filename, uint32_t patchsize)
+	{
+
+
+		unsigned char* pixels = stbi_load("textures/tess/eu4gray.png", &texWidth, &texHeight, &texChannels, 0);
+		//unsigned char* pixels = stbi_load("textures/tess/terrain_heightmap_r16.ktx", &texWidth, &texHeight, &texChannels, 4);
+		std::cout << "width=" << texWidth << " height=" << texHeight << " nrComponents=" << texChannels << std::endl;
+		for (int i = 0; i < 20; i++)
+		{
+			int p = *(pixels + i);
+			std::cout << std::hex << p << std::endl;
+		}
+		//gli::texture2d heightTex(gli::load(filename));
+		//dim = static_cast<uint32_t>(heightTex.extent().x);
+		//heightdata = new uint16_t[dim * dim];
+		heightdata = new uint8_t[texWidth * texHeight];
+		memcpy(heightdata, pixels, texWidth * texHeight * sizeof(uint8_t));
+		dim = texWidth;
+		this->scale = texWidth / patchsize;
+	};
+
+	~HeightMap()
+	{
+		delete[] heightdata;
+	}
+
+	float getHeight(uint32_t x, uint32_t y)
+	{
+		glm::ivec2 rpos = glm::ivec2(x, y) * glm::ivec2(scale);
+		//rpos.x = std::max(0, std::min(rpos.x, (int)dim - 1));
+		//rpos.y = std::max(0, std::min(rpos.y, (int)dim - 1));
+		rpos.x = std::max(0, std::min(rpos.x, (int)dim - 1));
+		rpos.y = std::max(0, std::min(rpos.y, (int)dim - 1));
+		rpos /= glm::ivec2(scale);
+		return *(heightdata + (rpos.x + rpos.y * dim) * scale) / 65535.0f;
+	}
+};
 
 
 DerpRenderer::DerpRenderer()
@@ -198,6 +246,10 @@ void DerpRenderer::cleanup()
 
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
+	std::cout << "\t--terrainVertex" << std::endl;
+	vmaDestroyBuffer(allocator, terrainVertexBuffer->buffer, terrainVertexBuffer->allocation);
+	std::cout << "\t--terrainIndex" << std::endl;
+	vmaDestroyBuffer(allocator, terrainIndexBuffer->buffer, terrainIndexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
 	vmaDestroyBuffer(allocator, uniformBuffer->uniformBuffers[0], uniformBuffer->bufferAllocation);
 	std::cout << "\t--allocator" << std::endl;
@@ -285,8 +337,19 @@ void DerpRenderer::beginDraw(Camera* camera)
 	// view projection matrix
 	glm::mat4 view = camera->getViewMatrix();
 	glm::mat4 proj = glm::perspective(glm::radians(camera->fov), (float)swapChain->extent.width / (float)swapChain->extent.height, 0.1f, 1000.0f);
-	proj[1][1] *= -1;
+	//proj[1][1] *= -1;
 	viewproj = proj * view;
+
+
+
+	uboTess.projection = proj;
+	uboTess.modelview = view * glm::mat4(1.0f);
+	uboTess.viewportDim = glm::vec2(swapChain->extent.width, swapChain->extent.height);
+
+	frustum.update(uboTess.projection * uboTess.modelview);
+	memcpy(uboTess.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
+
+	memcpy(uniformBuffer->data, &uboTess, sizeof(uboTess));
 }
 
 // draw simple vertices
@@ -349,3 +412,156 @@ void DerpRenderer::endDraw()
 			nullptr
 		));
 }
+
+// Generate a terrain quad patch for feeding to the tessellation control shader
+void DerpRenderer::generateTerrain()
+{
+
+#define PATCH_SIZE 128
+#define UV_SCALE 1.0f
+
+	const uint32_t vertexCount = PATCH_SIZE * PATCH_SIZE;
+	std::vector<Vertex> vertices;
+	vertices.resize(vertexCount);
+
+	const float wx = 2.0f;
+	const float wy = 2.0f;
+
+	for (auto x = 0; x < PATCH_SIZE; x++)
+	{
+		for (auto y = 0; y < PATCH_SIZE; y++)
+		{
+			uint32_t index = (x + y * PATCH_SIZE);
+			vertices[index].pos.x = x * wx + wx / 2.0f - (float)PATCH_SIZE * wx / 2.0f;
+			vertices[index].pos.y = 0.0f;
+			vertices[index].pos.z = y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
+			vertices[index].texCoord = glm::vec2((float)x / PATCH_SIZE, (float)y / PATCH_SIZE) * UV_SCALE;
+		}
+	}
+
+	// Calculate normals from height map using a sobel filter
+	HeightMap heightMap("terrain_heightmap_r16.ktx", PATCH_SIZE);
+
+	for (auto x = 0; x < PATCH_SIZE; x++)
+	{
+		for (auto y = 0; y < PATCH_SIZE; y++)
+		{
+			// Get height samples centered around current position
+			float heights[3][3];
+			for (auto hx = -1; hx <= 1; hx++)
+			{
+				for (auto hy = -1; hy <= 1; hy++)
+				{
+					heights[hx + 1][hy + 1] = heightMap.getHeight(x + hx, y + hy);
+				}
+			}
+
+			// Calculate the normal
+			glm::vec3 normal;
+			// Gx sobel filter
+			normal.x = heights[0][0] - heights[2][0] + 2.0f * heights[0][1] - 2.0f * heights[2][1] + heights[0][2] - heights[2][2];
+			// Gy sobel filter
+			normal.z = heights[0][0] + 2.0f * heights[1][0] + heights[2][0] - heights[0][2] - 2.0f * heights[1][2] - heights[2][2];
+			// Calculate missing up component of the normal using the filtered x and y axis
+			// The first value controls the bump strength
+			normal.y = 0.25f * sqrt(1.0f - normal.x * normal.x - normal.z * normal.z);
+
+			vertices[x + y * PATCH_SIZE].normal = glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
+		}
+	}
+
+	// Indices
+	const uint32_t w = (PATCH_SIZE - 1);
+	const uint32_t indexCount = w * w * 4;
+	std::vector<uint16_t> indices;
+	indices.resize(indexCount);
+	for (auto x = 0; x < w; x++)
+	{
+		for (auto y = 0; y < w; y++)
+		{
+			uint32_t index = (x + y * w) * 4;
+			indices[index] = (x + y * PATCH_SIZE);
+			indices[index + 1] = indices[index] + PATCH_SIZE;
+			indices[index + 2] = indices[index + 1] + 1;
+			indices[index + 3] = indices[index] + 1;
+		}
+	}
+	//models.terrain.indexCount = indexCount;
+
+	uint32_t vertexBufferSize = vertexCount * sizeof(Vertex);
+	uint32_t indexBufferSize = indexCount * sizeof(uint32_t);
+
+	//struct {
+	//	VkBuffer buffer;
+	//	VkDeviceMemory memory;
+	//} vertexStaging, indexStaging;
+
+	// Create staging buffers
+
+	terrainVertexBuffer = std::make_unique<DerpBufferLocal>(device, commandPool, vertices, allocator);
+	terrainIndexBuffer = std::make_unique<DerpBufferLocal>(device, commandPool, indices, allocator);
+
+	//VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	//	VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	//	VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	//	vertexBufferSize,
+	//	&vertexStaging.buffer,
+	//	&vertexStaging.memory,
+	//	vertices));
+
+	//VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	//	VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	//	VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	//	indexBufferSize,
+	//	&indexStaging.buffer,
+	//	&indexStaging.memory,
+	//	indices));
+
+	//VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	//	VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+	//	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+	//	vertexBufferSize,
+	//	&models.terrain.vertices.buffer,
+	//	&models.terrain.vertices.memory));
+
+	//VK_CHECK_RESULT(vulkanDevice->createBuffer(
+	//	VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+	//	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+	//	indexBufferSize,
+	//	&models.terrain.indices.buffer,
+	//	&models.terrain.indices.memory));
+
+	//// Copy from staging buffers
+	//VkCommandBuffer copyCmd = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+
+	//VkBufferCopy copyRegion = {};
+
+	//copyRegion.size = vertexBufferSize;
+	//vkCmdCopyBuffer(
+	//	copyCmd,
+	//	vertexStaging.buffer,
+	//	models.terrain.vertices.buffer,
+	//	1,
+	//	&copyRegion);
+
+	//copyRegion.size = indexBufferSize;
+	//vkCmdCopyBuffer(
+	//	copyCmd,
+	//	indexStaging.buffer,
+	//	models.terrain.indices.buffer,
+	//	1,
+	//	&copyRegion);
+
+	//VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
+
+	//models.terrain.device = device;
+
+	//vkDestroyBuffer(device, vertexStaging.buffer, nullptr);
+	//vkFreeMemory(device, vertexStaging.memory, nullptr);
+	//vkDestroyBuffer(device, indexStaging.buffer, nullptr);
+	//vkFreeMemory(device, indexStaging.memory, nullptr);
+
+	//delete[] vertices;
+	//delete[] indices;
+}
+

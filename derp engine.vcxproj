@@ -193,6 +193,7 @@
     <ClInclude Include="src\engine\FpsMonitor.h" />
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\vk_mem_alloc.h" />
+    <ClInclude Include="src\frustum.hpp" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\GameObject.h" />
     <ClInclude Include="src\GameObjectVertex.h" />

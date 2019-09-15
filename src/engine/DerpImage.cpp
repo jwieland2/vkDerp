@@ -19,10 +19,11 @@ void DerpImage::createTexture(std::unique_ptr<DerpDevice>& device, std::unique_p
 
 	// read file
 
-	unsigned char* pixels = stbi_load("textures/this.png", &texWidth, &texHeight, &texChannels, 0);
-	vk::DeviceSize imageSize = texWidth * texHeight * 4;
+	unsigned char* pixels = stbi_load("textures/tess/eu4gray.png", &texWidth, &texHeight, &texChannels, 0);
+	vk::DeviceSize imageSize = texWidth * texHeight * sizeof(unsigned char);
+	imageSize = texWidth * texHeight * sizeof(uint8_t);
 
-	std::cout << "\t" << texWidth << "x" << texHeight << ", " << texChannels << " channels" << std::endl;
+	std::cout << "\t" << texWidth << "x" << texHeight << ", " << texChannels << " channels, imageSize=" << imageSize << std::endl;
 
 	if (!pixels) {
 		throw std::runtime_error("failed to load texture image!");
@@ -41,7 +42,8 @@ void DerpImage::createTexture(std::unique_ptr<DerpDevice>& device, std::unique_p
 		setExtent(vk::Extent3D(static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), 1)).
 		setMipLevels(1).
 		setArrayLayers(1).
-		setFormat(vk::Format::eR8G8B8A8Unorm).
+		//setFormat(vk::Format::eR8G8B8A8Unorm).
+		setFormat(vk::Format::eR8Unorm).
 		setTiling(vk::ImageTiling::eOptimal).
 		setInitialLayout(vk::ImageLayout::eUndefined).
 		setUsage(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled).
@@ -123,7 +125,8 @@ void DerpImage::createTexture(std::unique_ptr<DerpDevice>& device, std::unique_p
 	vk::ImageViewCreateInfo imageViewCreateInfo = vk::ImageViewCreateInfo().
 		setImage(this->handle).
 		setViewType(vk::ImageViewType::e2D).
-		setFormat(vk::Format::eR8G8B8A8Unorm).
+		//setFormat(vk::Format::eR8G8B8A8Unorm).
+		setFormat(vk::Format::eR8Unorm).
 		setSubresourceRange(imageSubresourceRange2);
 
 	view = device->handle.createImageView(imageViewCreateInfo);

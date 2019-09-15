@@ -19,9 +19,13 @@ public:
 
     std::unique_ptr<DerpShader> vertShader;
     std::unique_ptr<DerpShader> fragShader;
+	std::unique_ptr<DerpShader> tescShader;
+	std::unique_ptr<DerpShader> teseShader;
 
     vk::ShaderModule vertShaderModule;
     vk::ShaderModule fragShaderModule;
+	vk::ShaderModule tescShaderModule;
+	vk::ShaderModule teseShaderModule;
 
 	vk::Pipeline handle;
 	vk::PipelineLayout layout;

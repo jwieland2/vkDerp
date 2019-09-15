@@ -7,8 +7,10 @@ DerpDevice::DerpDevice(std::unique_ptr<DerpPhysicalDevice>& physicalDevice)
 {
     std::cout << "create device" << std::endl;
     float queuePriority = 1.0f;
-    vk::PhysicalDeviceFeatures deviceFeatures = vk::PhysicalDeviceFeatures().
-		setSamplerAnisotropy(VK_TRUE);
+	vk::PhysicalDeviceFeatures deviceFeatures = vk::PhysicalDeviceFeatures().
+		setSamplerAnisotropy(VK_TRUE).
+		setFillModeNonSolid(VK_TRUE).
+		setTessellationShader(VK_TRUE);
 
     std::vector<vk::DeviceQueueCreateInfo> dqciV;
     std::set<uint32_t> uniqueQueueFamilies = { physicalDevice->queueFamilyIndices.graphicsFamily.value(), physicalDevice->queueFamilyIndices.presentFamily.value() };

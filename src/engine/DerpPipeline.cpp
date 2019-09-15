@@ -8,15 +8,21 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 		std::unique_ptr<DerpDescriptorSetLayout>& descriptorSetLayout)
 {
 	std::cout << "create pipeline" << std::endl;
-    vertShader = std::make_unique<DerpShader>("shaders/vert.spv");
-    fragShader = std::make_unique<DerpShader>("shaders/frag.spv");
+    vertShader = std::make_unique<DerpShader>("shaders/tess/terrain.vert.spv");
+    fragShader = std::make_unique<DerpShader>("shaders/tess/terrain.frag.spv");
+	tescShader = std::make_unique<DerpShader>("shaders/tess/terrain.tesc.spv");
+	teseShader = std::make_unique<DerpShader>("shaders/tess/terrain.tese.spv");
 
     vertShaderModule = vertShader->createModule(device->handle);
     fragShaderModule = fragShader->createModule(device->handle);
+	tescShaderModule = tescShader->createModule(device->handle);
+	teseShaderModule = teseShader->createModule(device->handle);
 
 	    vk::PipelineShaderStageCreateInfo shaderStages[] = {
-	        {{}, vk::ShaderStageFlagBits::eVertex, vertShaderModule, "main"},
-	        {{}, vk::ShaderStageFlagBits::eFragment, fragShaderModule, "main"}
+	        { {}, vk::ShaderStageFlagBits::eVertex, vertShaderModule, "main"},
+	        { {}, vk::ShaderStageFlagBits::eFragment, fragShaderModule, "main"},
+			{ {}, vk::ShaderStageFlagBits::eTessellationControl, tescShaderModule, "main"},
+			{ {}, vk::ShaderStageFlagBits::eTessellationEvaluation, teseShaderModule, "main"}
 	    };
 
 	auto bindingDescription = Vertex::getBindingDescription();
@@ -24,7 +30,8 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo({}, 1, &bindingDescription, static_cast<uint32_t>(attributeDescriptions.size()), attributeDescriptions.data());
 
-    vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::eTriangleList, VK_FALSE);
+    //vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::eTriangleList, VK_FALSE);
+	vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::ePatchList, VK_FALSE);
 
     vk::Viewport viewport(0.0f, 0.0f, (float)swapChain->extent.width, (float)swapChain->extent.height, 0.0f, 1.0f);
 
@@ -39,7 +46,7 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 		setDepthBoundsTestEnable(VK_FALSE).
 		setStencilTestEnable(VK_FALSE);
 
-	vk::PipelineRasterizationStateCreateInfo rasterizer({}, VK_FALSE, VK_FALSE, vk::PolygonMode::eFill, vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f);
+	vk::PipelineRasterizationStateCreateInfo rasterizer({}, VK_FALSE, VK_FALSE, vk::PolygonMode::eLine, vk::CullModeFlagBits::eNone, vk::FrontFace::eClockwise, VK_FALSE, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	vk::PipelineMultisampleStateCreateInfo multisampling({}, vk::SampleCountFlagBits::e1, VK_FALSE, 1.0f, nullptr, VK_FALSE, VK_FALSE);
 
@@ -62,6 +69,9 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
         &colorBlendAttachment
     );
 
+	vk::PipelineTessellationStateCreateInfo tessCreateInfo = vk::PipelineTessellationStateCreateInfo().
+		setPatchControlPoints(4);
+
 	vk::PushConstantRange pushRange(vk::ShaderStageFlagBits::eVertex, 0, sizeof(glm::mat4));
 
 	//vk::PipelineLayoutCreateInfo plci({}, 0, nullptr, 1, &pushRange);	// push only
@@ -71,25 +81,26 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 
     layout = device->handle.createPipelineLayout(plci);
 
-    vk::GraphicsPipelineCreateInfo gpci = {};
-        gpci.stageCount = 2;
-        gpci.pStages = shaderStages;
-        gpci.pVertexInputState = &vertexInputInfo;
-		gpci.pInputAssemblyState = &inputAssembly;
-        gpci.pViewportState = &viewportState;
-        gpci.pRasterizationState = &rasterizer;
-        gpci.pMultisampleState = &multisampling;
-        gpci.pDepthStencilState = &depthStencil;
-        gpci.pColorBlendState = &colorBlending;
-        gpci.pDynamicState = nullptr;
-        gpci.layout = layout;
-		gpci.renderPass = renderPass->handle;
-        gpci.subpass = 0;
+	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = vk::GraphicsPipelineCreateInfo().
+		setStageCount(4).
+		setPStages(shaderStages).
+		setPVertexInputState(&vertexInputInfo).
+		setPInputAssemblyState(&inputAssembly).
+		setPViewportState(&viewportState).
+		setPRasterizationState(&rasterizer).
+		setPMultisampleState(&multisampling).
+		setPDepthStencilState(&depthStencil).
+		setPColorBlendState(&colorBlending).
+		setPTessellationState(&tessCreateInfo).
+		setLayout(layout).
+		setRenderPass(renderPass->handle);
 
-    handle = device->handle.createGraphicsPipeline(nullptr, gpci);
+    handle = device->handle.createGraphicsPipeline(nullptr, graphicsPipelineCreateInfo);
     
     device->handle.destroyShaderModule(vertShaderModule);
     device->handle.destroyShaderModule(fragShaderModule);
+	device->handle.destroyShaderModule(tescShaderModule);
+	device->handle.destroyShaderModule(teseShaderModule);
 }
 
 

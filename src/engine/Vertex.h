@@ -45,9 +45,22 @@ struct mvp4 {
 //	glm::vec4 uColor;
 //};
 
-struct ubo {
-	glm::mat4 dummy = glm::mat4(1.0f);
+	// Shared values for tessellation control and evaluation stages
+struct UBO {
+	glm::mat4 projection;
+	glm::mat4 modelview;
+	glm::vec4 lightPos = glm::vec4(-48.0f, -40.0f, 46.0f, 0.0f);
+	glm::vec4 frustumPlanes[6];
+	float displacementFactor = 32.0f;
+	float tessellationFactor = 0.75f;
+	glm::vec2 viewportDim;
+	// Desired size of tessellated quad patch edge
+	float tessellatedEdgeSize = 20.0f;
 };
+
+//struct ubo {
+//	glm::mat4 dummy = glm::mat4(1.0f);
+//};
 
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
@@ -57,3 +70,4 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 	out << std::fixed << a_value;
 	return out.str();
 }
+

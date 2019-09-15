@@ -28,14 +28,14 @@ DerpDescriptorSet::DerpDescriptorSet(
 		uniformDescriptor = vk::DescriptorBufferInfo()
 			.setBuffer(derpBufferUniform->uniformBuffers[0])
 			.setOffset(0)
-			.setRange(sizeof(ubo));
+			.setRange(sizeof(UBO));
 
 		imageDescriptor = vk::DescriptorImageInfo()
 			.setSampler(sampler->handle)
 			.setImageView(texture->view)
 			.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
 		
-
+		// ubo
 		writeDescriptorSets.push_back(vk::WriteDescriptorSet()
 			.setDstSet(handle)
 			.setDstBinding(0)
@@ -44,6 +44,7 @@ DerpDescriptorSet::DerpDescriptorSet(
 			.setDescriptorType(vk::DescriptorType::eUniformBuffer)
 			.setPBufferInfo(&uniformDescriptor));
 
+		// heightmap
 		writeDescriptorSets.push_back(vk::WriteDescriptorSet()
 			.setDstSet(handle)
 			.setDstBinding(1)
@@ -51,6 +52,15 @@ DerpDescriptorSet::DerpDescriptorSet(
 			.setDescriptorCount(1)
 			.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
 			.setPImageInfo(&imageDescriptor));
+
+		// texture
+		//writeDescriptorSets.push_back(vk::WriteDescriptorSet()
+		//	.setDstSet(handle)
+		//	.setDstBinding(2)
+		//	.setDstArrayElement(0)
+		//	.setDescriptorCount(1)
+		//	.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
+		//	.setPImageInfo(&imageDescriptor));
 
 		device->handle.updateDescriptorSets(writeDescriptorSets, nullptr);
 }
