@@ -22,6 +22,7 @@ public:
 		std::unique_ptr<DerpDescriptorPool>& descriptorPool,
 		std::unique_ptr<DerpBufferUniform>& derpBufferUniform,
 		std::unique_ptr<DerpImage>& texture,
+		std::unique_ptr<DerpImage>& height,
 		std::unique_ptr<DerpSampler>& sampler);
 	~DerpDescriptorSet();
 
@@ -29,5 +30,6 @@ public:
 
 	vk::DescriptorBufferInfo uniformDescriptor;
 	vk::DescriptorImageInfo imageDescriptor;
+	vk::DescriptorImageInfo heightDescriptor;
 };
 

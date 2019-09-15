@@ -30,8 +30,6 @@
 #include "Camera.h"
 #include "frustum.hpp"
 
-//#include <stb/stb_image.h>
-
 const int WIDTH = 1400;
 const int HEIGHT = 800;
 const int COMMAND_BUFFER_COUNT = 2;
@@ -55,6 +53,7 @@ public:
 	std::unique_ptr<DerpFramebuffers> framebuffers;
 	std::unique_ptr<DerpCommandPool> commandPool;
 	std::unique_ptr<DerpImage> texture;
+	std::unique_ptr<DerpImage> heightmap;
 	std::unique_ptr<DerpSampler> sampler;
 	std::unique_ptr<DerpImage> depthBuffer;
 	std::unique_ptr<DerpBufferUniform> uniformBuffer;
@@ -63,8 +62,8 @@ public:
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
 
-	std::unique_ptr<DerpBufferLocal> terrainVertexBuffer;
-	std::unique_ptr<DerpBufferLocal> terrainIndexBuffer;
+	//std::unique_ptr<DerpBufferLocal> terrainVertexBuffer;
+	//std::unique_ptr<DerpBufferLocal> terrainIndexBuffer;
 
 	// drawing
 	vk::CommandBuffer* cmd;

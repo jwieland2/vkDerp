@@ -16,7 +16,7 @@ void Game::run()
 {
 	
 	renderer = new DerpRenderer;
-	renderer->generateTerrain();
+	terrain = new Terrain(renderer);
 	camera = new Camera(glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glfwSetWindowUserPointer(renderer->window, this);
 	input = new Input(renderer);
@@ -57,7 +57,7 @@ void Game::mainLoop()
 		//		renderer->drawObject(model, vertexObjects[i]->objVertexBuffer.get());
 		//}
 
-		renderer->drawObject(glm::mat4(1.0f), renderer->terrainVertexBuffer.get(), renderer->terrainIndexBuffer.get());
+		renderer->drawObject(glm::mat4(1.0f), terrain->vertexBuffer.get(), terrain->indexBuffer.get());
 
         renderer->endDraw();
 		camera->updateCameraVectors();
@@ -66,6 +66,7 @@ void Game::mainLoop()
     renderer->device->handle.waitIdle();
 	for (auto o : vertexObjects)
 		delete o;
+	delete terrain;
 	delete renderer;
 }
 

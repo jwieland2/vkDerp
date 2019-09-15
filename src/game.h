@@ -11,6 +11,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #include "engine/DerpRenderer.h"
+#include "Terrain.h"
 #include "Input.h"
 #include "Camera.h"
 #include "GameObjectVertex.h"
@@ -26,6 +27,7 @@ public:
 	DerpRenderer *renderer;
 	Input *input;
 	Camera *camera;
+	Terrain *terrain;
 
 	std::vector<GameObjectVertex*> vertexObjects;
 

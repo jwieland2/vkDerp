@@ -11,7 +11,7 @@ DerpImage::~DerpImage()
 {
 }
 
-void DerpImage::createTexture(std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator)
+void DerpImage::createTexture(std::string file, std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator)
 {
 	std::cout << "create texture" << std::endl;
 
@@ -19,7 +19,7 @@ void DerpImage::createTexture(std::unique_ptr<DerpDevice>& device, std::unique_p
 
 	// read file
 
-	unsigned char* pixels = stbi_load("textures/tess/eu4gray.png", &texWidth, &texHeight, &texChannels, 0);
+	unsigned char* pixels = stbi_load(file.c_str(), &texWidth, &texHeight, &texChannels, 0);
 	vk::DeviceSize imageSize = texWidth * texHeight * sizeof(unsigned char);
 	imageSize = texWidth * texHeight * sizeof(uint8_t);
 
