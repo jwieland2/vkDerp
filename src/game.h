@@ -27,7 +27,7 @@ public:
 	DerpRenderer *renderer;
 	Input *input;
 	Camera *camera;
-	Terrain *terrain;
+	//Terrain *terrain;
 
 	std::vector<GameObjectVertex*> vertexObjects;
 

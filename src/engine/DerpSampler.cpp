@@ -15,8 +15,8 @@ DerpSampler::DerpSampler(std::unique_ptr<DerpDevice>& device)
 		setBorderColor(vk::BorderColor::eIntOpaqueWhite).
 		setUnnormalizedCoordinates(VK_FALSE).
 		setCompareEnable(VK_FALSE).
-		//setCompareOp(vk::CompareOp::eAlways).
-		setCompareOp(vk::CompareOp::eNever).
+		setCompareOp(vk::CompareOp::eAlways).
+		//setCompareOp(vk::CompareOp::eNever).
 		setMipmapMode(vk::SamplerMipmapMode::eLinear).
 		setMipLodBias(0.0f).
 		setMinLod(0.0f).

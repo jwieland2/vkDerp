@@ -8,21 +8,23 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 		std::unique_ptr<DerpDescriptorSetLayout>& descriptorSetLayout)
 {
 	std::cout << "create pipeline" << std::endl;
-    vertShader = std::make_unique<DerpShader>("shaders/tess/terrain.vert.spv");
-    fragShader = std::make_unique<DerpShader>("shaders/tess/terrain.frag.spv");
-	tescShader = std::make_unique<DerpShader>("shaders/tess/terrain.tesc.spv");
-	teseShader = std::make_unique<DerpShader>("shaders/tess/terrain.tese.spv");
+ //   vertShader = std::make_unique<DerpShader>("shaders/tess/terrain.vert.spv");
+ //   fragShader = std::make_unique<DerpShader>("shaders/tess/terrain.frag.spv");
+	//tescShader = std::make_unique<DerpShader>("shaders/tess/terrain.tesc.spv");
+	//teseShader = std::make_unique<DerpShader>("shaders/tess/terrain.tese.spv");
+	vertShader = std::make_unique<DerpShader>("shaders/vert.spv");
+	fragShader = std::make_unique<DerpShader>("shaders/frag.spv");
 
     vertShaderModule = vertShader->createModule(device->handle);
     fragShaderModule = fragShader->createModule(device->handle);
-	tescShaderModule = tescShader->createModule(device->handle);
-	teseShaderModule = teseShader->createModule(device->handle);
+	//tescShaderModule = tescShader->createModule(device->handle);
+	//teseShaderModule = teseShader->createModule(device->handle);
 
 	    vk::PipelineShaderStageCreateInfo shaderStages[] = {
 	        { {}, vk::ShaderStageFlagBits::eVertex, vertShaderModule, "main"},
 	        { {}, vk::ShaderStageFlagBits::eFragment, fragShaderModule, "main"},
-			{ {}, vk::ShaderStageFlagBits::eTessellationControl, tescShaderModule, "main"},
-			{ {}, vk::ShaderStageFlagBits::eTessellationEvaluation, teseShaderModule, "main"}
+			//{ {}, vk::ShaderStageFlagBits::eTessellationControl, tescShaderModule, "main"},
+			//{ {}, vk::ShaderStageFlagBits::eTessellationEvaluation, teseShaderModule, "main"}
 	    };
 
 	auto bindingDescription = Vertex::getBindingDescription();
@@ -30,8 +32,8 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 
 	vk::PipelineVertexInputStateCreateInfo vertexInputInfo({}, 1, &bindingDescription, static_cast<uint32_t>(attributeDescriptions.size()), attributeDescriptions.data());
 
-    //vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::eTriangleList, VK_FALSE);
-	vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::ePatchList, VK_FALSE);
+    vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::eTriangleList, VK_FALSE);
+	//vk::PipelineInputAssemblyStateCreateInfo inputAssembly({}, vk::PrimitiveTopology::ePatchList, VK_FALSE);
 
     vk::Viewport viewport(0.0f, 0.0f, (float)swapChain->extent.width, (float)swapChain->extent.height, 0.0f, 1.0f);
 
@@ -82,7 +84,7 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
     layout = device->handle.createPipelineLayout(plci);
 
 	vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = vk::GraphicsPipelineCreateInfo().
-		setStageCount(4).
+		setStageCount(2).
 		setPStages(shaderStages).
 		setPVertexInputState(&vertexInputInfo).
 		setPInputAssemblyState(&inputAssembly).
@@ -91,7 +93,7 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
 		setPMultisampleState(&multisampling).
 		setPDepthStencilState(&depthStencil).
 		setPColorBlendState(&colorBlending).
-		setPTessellationState(&tessCreateInfo).
+		//setPTessellationState(&tessCreateInfo).
 		setLayout(layout).
 		setRenderPass(renderPass->handle);
 
@@ -99,8 +101,8 @@ DerpPipeline::DerpPipeline(std::unique_ptr<DerpDevice>& device,
     
     device->handle.destroyShaderModule(vertShaderModule);
     device->handle.destroyShaderModule(fragShaderModule);
-	device->handle.destroyShaderModule(tescShaderModule);
-	device->handle.destroyShaderModule(teseShaderModule);
+	//device->handle.destroyShaderModule(tescShaderModule);
+	//device->handle.destroyShaderModule(teseShaderModule);
 }
 
 

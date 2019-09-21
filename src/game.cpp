@@ -66,7 +66,7 @@ void Game::mainLoop()
     renderer->device->handle.waitIdle();
 	for (auto o : vertexObjects)
 		delete o;
-	delete terrain;
+	//delete terrain;
 	delete renderer;
 }
 

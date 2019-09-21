@@ -58,14 +58,12 @@ void DerpRenderer::initVulkan()
 	// buffers
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture("textures/texture.jpg", device, commandPool, allocator);
-	heightmap			= std::make_unique<DerpImage>();
-	heightmap->createTexture("textures/fill.png", device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, allocator);
 
 	// rendering
 	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
-	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, heightmap, sampler);
+	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
 	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
 	sync			= std::make_unique<DerpSync>(device);
 }
@@ -155,7 +153,7 @@ void DerpRenderer::recreateSwapChain()
 	descriptorPool = std::make_unique<DerpDescriptorPool>(device, swapChain);
 	std::cout << "\t++descriptorPool" << std::endl;
 
-	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, heightmap, sampler);
+	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
 	std::cout << "\t++descriptorSet" << std::endl;
 
 	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
@@ -179,8 +177,8 @@ void DerpRenderer::cleanup()
 	std::cout << "--texture view" << std::endl;
 	device->handle.destroyImageView(texture->view);
 
-	std::cout << "--height view" << std::endl;
-	device->handle.destroyImageView(heightmap->view);
+	//std::cout << "--height view" << std::endl;
+	//device->handle.destroyImageView(heightmap->view);
 
 	std::cout << "--descriptorSetLayout" << std::endl;
 	device->handle.destroyDescriptorSetLayout(descriptorSetLayout->handle);
@@ -200,11 +198,11 @@ void DerpRenderer::cleanup()
 
 	std::cout << "\t--tex image" << std::endl;
 	vmaDestroyImage(allocator, texture->handle, texture->allocation);
-	std::cout << "\t--height image" << std::endl;
-	vmaDestroyImage(allocator, heightmap->handle, heightmap->allocation);
-	std::cout << "\t--terrainVertex" << std::endl;
+	//std::cout << "\t--height image" << std::endl;
+	//vmaDestroyImage(allocator, heightmap->handle, heightmap->allocation);
+	//std::cout << "\t--terrainVertex" << std::endl;
 	//vmaDestroyBuffer(allocator, terrainVertexBuffer->buffer, terrainVertexBuffer->allocation);
-	std::cout << "\t--terrainIndex" << std::endl;
+	//std::cout << "\t--terrainIndex" << std::endl;
 	//vmaDestroyBuffer(allocator, terrainIndexBuffer->buffer, terrainIndexBuffer->allocation);
 	std::cout << "\t--uniform buffer" << std::endl;
 	vmaDestroyBuffer(allocator, uniformBuffer->uniformBuffers[0], uniformBuffer->bufferAllocation);
@@ -298,14 +296,14 @@ void DerpRenderer::beginDraw(Camera* camera)
 
 
 
-	uboTess.projection = proj;
-	uboTess.modelview = view * glm::mat4(1.0f);
-	uboTess.viewportDim = glm::vec2(swapChain->extent.width, swapChain->extent.height);
+	//uboTess.projection = proj;
+	//uboTess.modelview = view * glm::mat4(1.0f);
+	//uboTess.viewportDim = glm::vec2(swapChain->extent.width, swapChain->extent.height);
 
-	frustum.update(uboTess.projection * uboTess.modelview);
-	memcpy(uboTess.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
+	//frustum.update(uboTess.projection * uboTess.modelview);
+	//memcpy(uboTess.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
 
-	memcpy(uniformBuffer->data, &uboTess, sizeof(uboTess));
+	//memcpy(uniformBuffer->data, &uboTess, sizeof(uboTess));
 }
 
 // draw simple vertices

@@ -9,7 +9,7 @@ DerpDescriptorSet::DerpDescriptorSet(
 	std::unique_ptr<DerpDescriptorPool>& descriptorPool,
 	std::unique_ptr<DerpBufferUniform>& derpBufferUniform,
 	std::unique_ptr<DerpImage>& texture,
-	std::unique_ptr<DerpImage>& height,
+	//std::unique_ptr<DerpImage>& height,
 	std::unique_ptr<DerpSampler>& sampler)
 {
 	std::cout << "create descriptorSet" << std::endl;
@@ -31,10 +31,10 @@ DerpDescriptorSet::DerpDescriptorSet(
 			.setOffset(0)
 			.setRange(sizeof(UBO));
 
-		heightDescriptor = vk::DescriptorImageInfo()
-			.setSampler(sampler->handle)
-			.setImageView(height->view)
-			.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+		//heightDescriptor = vk::DescriptorImageInfo()
+		//	.setSampler(sampler->handle)
+		//	.setImageView(height->view)
+		//	.setImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
 
 		imageDescriptor = vk::DescriptorImageInfo()
 			.setSampler(sampler->handle)
@@ -50,19 +50,19 @@ DerpDescriptorSet::DerpDescriptorSet(
 			.setDescriptorType(vk::DescriptorType::eUniformBuffer)
 			.setPBufferInfo(&uniformDescriptor));
 
-		// heightmap
-		writeDescriptorSets.push_back(vk::WriteDescriptorSet()
-			.setDstSet(handle)
-			.setDstBinding(1)
-			.setDstArrayElement(0)
-			.setDescriptorCount(1)
-			.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
-			.setPImageInfo(&heightDescriptor));
+		//// heightmap
+		//writeDescriptorSets.push_back(vk::WriteDescriptorSet()
+		//	.setDstSet(handle)
+		//	.setDstBinding(1)
+		//	.setDstArrayElement(0)
+		//	.setDescriptorCount(1)
+		//	.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)
+		//	.setPImageInfo(&heightDescriptor));
 
 		// texture
 		writeDescriptorSets.push_back(vk::WriteDescriptorSet()
 			.setDstSet(handle)
-			.setDstBinding(2)
+			.setDstBinding(1)
 			.setDstArrayElement(0)
 			.setDescriptorCount(1)
 			.setDescriptorType(vk::DescriptorType::eCombinedImageSampler)

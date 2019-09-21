@@ -41,10 +41,6 @@ struct mvp4 {
 	glm::mat4 mvp;
 };
 
-//struct color {
-//	glm::vec4 uColor;
-//};
-
 	// Shared values for tessellation control and evaluation stages
 struct UBO {
 	glm::mat4 projection;

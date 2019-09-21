@@ -53,7 +53,6 @@ public:
 	std::unique_ptr<DerpFramebuffers> framebuffers;
 	std::unique_ptr<DerpCommandPool> commandPool;
 	std::unique_ptr<DerpImage> texture;
-	std::unique_ptr<DerpImage> heightmap;
 	std::unique_ptr<DerpSampler> sampler;
 	std::unique_ptr<DerpImage> depthBuffer;
 	std::unique_ptr<DerpBufferUniform> uniformBuffer;
@@ -61,9 +60,6 @@ public:
 	std::unique_ptr<DerpDescriptorSet> descriptorSet;
 	std::unique_ptr<DerpCommandBuffer> commandBuffers;
 	std::unique_ptr<DerpSync> sync;
-
-	//std::unique_ptr<DerpBufferLocal> terrainVertexBuffer;
-	//std::unique_ptr<DerpBufferLocal> terrainIndexBuffer;
 
 	// drawing
 	vk::CommandBuffer* cmd;
@@ -93,9 +89,4 @@ public:
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer);
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer, DerpBufferLocal* indexBuffer);
 	void endDraw();
-
-	void generateTerrain();
-	//void updateUniformBuffers();
-
-
 };
