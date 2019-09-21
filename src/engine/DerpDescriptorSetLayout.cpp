@@ -11,24 +11,17 @@ DerpDescriptorSetLayout::DerpDescriptorSetLayout(std::unique_ptr<DerpDevice>& de
 		setDescriptorCount(1).
 		setDescriptorType(vk::DescriptorType::eUniformBuffer).
 		setPImmutableSamplers(nullptr).
-		setStageFlags(vk::ShaderStageFlagBits::eTessellationControl | vk::ShaderStageFlagBits::eTessellationEvaluation | vk::ShaderStageFlagBits::eVertex);
-
-	vk::DescriptorSetLayoutBinding heightmapLayoutBinding = vk::DescriptorSetLayoutBinding().
-		setBinding(1).
-		setDescriptorCount(1).
-		setDescriptorType(vk::DescriptorType::eCombinedImageSampler).
-		setPImmutableSamplers(nullptr).
-		setStageFlags(vk::ShaderStageFlagBits::eTessellationControl | vk::ShaderStageFlagBits::eTessellationEvaluation | vk::ShaderStageFlagBits::eFragment);
+		setStageFlags(vk::ShaderStageFlagBits::eVertex);
 
 	vk::DescriptorSetLayoutBinding samplerLayoutBinding = vk::DescriptorSetLayoutBinding().
 		setBinding(2).
 		setDescriptorCount(1).
 		setDescriptorType(vk::DescriptorType::eCombinedImageSampler).
 		setPImmutableSamplers(nullptr).
-		setStageFlags(vk::ShaderStageFlagBits::eFragment | vk::ShaderStageFlagBits::eTessellationEvaluation | vk::ShaderStageFlagBits::eTessellationControl);
+		setStageFlags(vk::ShaderStageFlagBits::eFragment);
 
-	std::array<vk::DescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, heightmapLayoutBinding, samplerLayoutBinding };
-	//std::array<vk::DescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, heightmapLayoutBinding };
+	//std::array<vk::DescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, heightmapLayoutBinding, samplerLayoutBinding };
+	std::array<vk::DescriptorSetLayoutBinding, 1> bindings = { uboLayoutBinding };
 
     vk::DescriptorSetLayoutCreateInfo layoutInfo(
         {},

@@ -59,7 +59,7 @@ void DerpRenderer::initVulkan()
 	texture			= std::make_unique<DerpImage>();
 	texture->createTexture("textures/texture.jpg", device, commandPool, allocator);
 	heightmap			= std::make_unique<DerpImage>();
-	heightmap->createTexture("textures/heightmap.png", device, commandPool, allocator);
+	heightmap->createTexture("textures/fill.png", device, commandPool, allocator);
 	sampler			= std::make_unique<DerpSampler>(device);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, allocator);
 

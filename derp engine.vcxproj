@@ -202,6 +202,14 @@
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Terrain.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\t.frag" />
+    <None Include="shaders\t.vert" />
+    <None Include="shaders\tess\terrain.frag" />
+    <None Include="shaders\tess\terrain.tesc" />
+    <None Include="shaders\tess\terrain.tese" />
+    <None Include="shaders\tess\terrain.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

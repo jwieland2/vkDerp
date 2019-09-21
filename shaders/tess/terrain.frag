@@ -1,6 +1,7 @@
 #version 450
 
-layout (set = 0, binding = 1) uniform sampler2D samplerHeight; 
+layout (set = 0, binding = 1) uniform sampler2D samplerHeight;
+layout (set = 0, binding = 2) uniform sampler2D albedo;
 
 layout (location = 0) in vec3 inNormal;
 layout (location = 1) in vec2 inUV;
@@ -30,5 +31,6 @@ void main()
 
 	const vec4 fogColor = vec4(0.47, 0.5, 0.67, 0.0);
 	//outFragColor  = mix(color, fogColor, fog(0.25));	
-	outFragColor = vec4(0.0, 0.0, 0.0, 1.0);
+	//outFragColor = texture(albedo, inUV);
+	outFragColor = vec4(inNormal, 1.0);
 }

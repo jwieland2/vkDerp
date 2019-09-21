@@ -19,6 +19,9 @@
     <Filter Include="Header Files\engine">
       <UniqueIdentifier>{117b5226-bb6c-47f4-9f9d-91e1fec0d7e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{196413f7-33ef-4293-bc67-3ba292338852}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\DerpBufferStaging.cpp">
@@ -215,5 +218,25 @@
     <ClInclude Include="src\Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\t.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\t.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\tess\terrain.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\tess\terrain.tesc">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\tess\terrain.tese">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\tess\terrain.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
