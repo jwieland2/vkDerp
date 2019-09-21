@@ -45,10 +45,6 @@ DerpInstance::DerpInstance()
 
 DerpInstance::~DerpInstance()
 {
-    //if (enableValidationLayers)
-    //    handle.destroyDebugUtilsMessengerEXT(debugMessenger, nullptr, dynamicLoader);
-
-    //handle.destroy();
 }
 
 bool DerpInstance::checkValidationLayerSupport()

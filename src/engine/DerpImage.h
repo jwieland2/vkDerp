@@ -17,8 +17,19 @@ public:
 	DerpImage();
 	~DerpImage();
 
-	void createDepthBuffer(std::unique_ptr<DerpPhysicalDevice>& physicalDevice, std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpSwapChain>& swapChain, VmaAllocator& allocator);
-	void createTexture(std::string file, std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator);
+	void createTexture(
+		DerpImageInit& init,
+		std::unique_ptr<DerpDevice>& device,
+		std::unique_ptr<DerpCommandPool>& commandPool,
+		VmaAllocator& allocator);
+
+	void createDepthBuffer(
+		std::unique_ptr<DerpPhysicalDevice>& physicalDevice,
+		std::unique_ptr<DerpDevice>& device,
+		std::unique_ptr<DerpSwapChain>& swapChain,
+		VmaAllocator& allocator);
+
+
 
 	vk::Image handle;
 	vk::Format format;

@@ -5,7 +5,7 @@
 DerpBufferUniform::DerpBufferUniform(std::unique_ptr<DerpDevice> & device, VmaAllocator& allocator)
 {
 	std::cout << "create uniform buffer" << std::endl;
-	vk::DeviceSize bufferSize = sizeof(UBO);
+	vk::DeviceSize bufferSize = sizeof(mvp4);
 
     uniformBuffers.resize(1);
 
@@ -23,7 +23,7 @@ DerpBufferUniform::DerpBufferUniform(std::unique_ptr<DerpDevice> & device, VmaAl
 
 	vmaCreateBuffer(allocator, (VkBufferCreateInfo*)&ci, &allocCreateInfo, (VkBuffer*)&(uniformBuffers[0]), &bufferAllocation, &uniformBufferAllocInfo);
 
-	data = (UBO*)uniformBufferAllocInfo.pMappedData;
+	data = (mvp4*)uniformBufferAllocInfo.pMappedData;
 }
 
 

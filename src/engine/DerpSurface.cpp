@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 
-DerpSurface::DerpSurface(std::unique_ptr<DerpInstance>& instance, GLFWwindow* window)// : instanceRef(instance->handle)
+DerpSurface::DerpSurface(std::unique_ptr<DerpInstance>& instance, GLFWwindow* window)
 {
     std::cout << "create surface" << std::endl;
     
@@ -11,13 +11,11 @@ DerpSurface::DerpSurface(std::unique_ptr<DerpInstance>& instance, GLFWwindow* wi
     {
         throw std::runtime_error("failed to create window surface!");
     }
-	//this->instanceRef = instance->handle;
     handle = vk::UniqueSurfaceKHR(vksurface, instance->handle);
-	//vkDestroySurfaceKHR(this->instanceRef, vksurface, nullptr);
 }
 
 
 DerpSurface::~DerpSurface()
 {
-	//vkDestroySurfaceKHR(this->instanceRef, vksurface, nullptr);
+
 }

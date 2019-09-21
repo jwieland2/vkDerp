@@ -21,8 +21,14 @@ DerpPhysicalDevice::DerpPhysicalDevice(std::unique_ptr<DerpInstance>& instance, 
 
 		// print info
 		std::cout << "\tDevice: " << deviceProperties.deviceName << std::endl;
+		std::cout << "\tVendor: " << deviceProperties.vendorID << std::endl;
+		std::cout << "\tDriver Version: " << (deviceProperties.driverVersion) << std::endl;
 		std::cout << "\tType: " << vk::to_string(deviceProperties.deviceType) << std::endl;
 		std::cout << "\tpushConstants max bytes: " << deviceProperties.limits.maxPushConstantsSize << std::endl;
+		std::cout << "\tpipelineStatisticsQuery: " << (deviceFeatures.pipelineStatisticsQuery ? "Yes" : "No") << std::endl;
+		std::cout << "\tTessellation Shader: " << (deviceFeatures.tessellationShader ? "Yes" : "No") << std::endl;
+		std::cout << "\tGeometry Shader: " << (deviceFeatures.geometryShader ? "Yes" : "No") << std::endl;
+		
 
 
         // isDeviceSuitable

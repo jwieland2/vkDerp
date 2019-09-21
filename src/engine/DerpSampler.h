@@ -3,12 +3,13 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
 
+#include "Vertex.h"
 #include "DerpDevice.h"
 
 class DerpSampler
 {
 public:
-	DerpSampler(std::unique_ptr<DerpDevice>& device);
+	DerpSampler(DerpSamplerInit& init, std::unique_ptr<DerpDevice>& device);
 	~DerpSampler();
 
 	vk::Sampler handle;

@@ -16,14 +16,13 @@
 class DerpDescriptorSet
 {
 public:
-	DerpDescriptorSet(std::unique_ptr<DerpDevice>& device,
+	DerpDescriptorSet(
+		DerpDescriptorInit& init,
+		std::unique_ptr<DerpDevice>& device,
 		std::unique_ptr<DerpSwapChain>& swapChain,
 		std::unique_ptr<DerpDescriptorSetLayout>& layout,
 		std::unique_ptr<DerpDescriptorPool>& descriptorPool,
-		std::unique_ptr<DerpBufferUniform>& derpBufferUniform,
-		std::unique_ptr<DerpImage>& texture,
-		//std::unique_ptr<DerpImage>& height,
-		std::unique_ptr<DerpSampler>& sampler);
+		std::unique_ptr<DerpBufferUniform>& derpBufferUniform);
 	~DerpDescriptorSet();
 
 	vk::DescriptorSet handle;
@@ -31,5 +30,6 @@ public:
 	vk::DescriptorBufferInfo uniformDescriptor;
 	vk::DescriptorImageInfo imageDescriptor;
 	vk::DescriptorImageInfo heightDescriptor;
+	vk::DescriptorImageInfo samplerDescriptor;
 };
 

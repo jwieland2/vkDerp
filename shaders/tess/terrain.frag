@@ -26,11 +26,12 @@ void main()
 	vec3 L = normalize(inLightVec);
 	vec3 ambient = vec3(0.5);
 	vec3 diffuse = max(dot(N, L), 0.0) * vec3(1.0);
+    mat4 align = mat4(1.0);
+
 
 	vec4 color = vec4((ambient + diffuse), 1.0);
-
 	const vec4 fogColor = vec4(0.47, 0.5, 0.67, 0.0);
-	//outFragColor  = mix(color, fogColor, fog(0.25));	
+    //outFragColor = mix(color, fogColor, fog(0.25));
 	//outFragColor = texture(albedo, inUV);
 	outFragColor = vec4(inNormal, 1.0);
 }

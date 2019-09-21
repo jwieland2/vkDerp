@@ -36,6 +36,22 @@ void DerpRenderer::initVma()
 
 void DerpRenderer::initVulkan()
 {
+	// init structs
+	DerpPipelineInit basicPipelineInit;
+	{
+		basicPipelineInit.vertPath = "shaders/vert.spv";
+		basicPipelineInit.fragPath = "shaders/frag.spv";
+		basicPipelineInit.pushSize = sizeof(uint32_t);
+		basicPipelineInit.pushStage = vk::ShaderStageFlagBits::eFragment;
+		basicPipelineInit.hasUniform = true;
+		basicPipelineInit.hasPushConstants = true;
+	}
+
+	DerpImageInit headInit;
+	{
+		headInit.path = "textures/texture.jpg";
+	}
+
 	// context
 	instance		= std::make_unique<DerpInstance>();
 	surface			= std::make_unique<DerpSurface>(instance, window);
@@ -52,18 +68,22 @@ void DerpRenderer::initVulkan()
 	renderPass		= std::make_unique<DerpRenderPass>(device, swapChain);
 	framebuffers	= std::make_unique<DerpFramebuffers>(device, swapChain, depthBuffer, renderPass);
 	descriptorSetLayout = std::make_unique<DerpDescriptorSetLayout>(device);
-	pipeline		= std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
+	pipeline		= std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout, basicPipelineInit);
 	commandPool		= std::make_unique<DerpCommandPool>(physicalDevice, device);
 
 	// buffers
 	texture			= std::make_unique<DerpImage>();
-	texture->createTexture("textures/texture.jpg", device, commandPool, allocator);
-	sampler			= std::make_unique<DerpSampler>(device);
+	texture->createTexture(headInit, device, commandPool, allocator);
+	sampler			= std::make_unique<DerpSampler>(DerpSamplerInit(), device);
 	uniformBuffer	= std::make_unique<DerpBufferUniform>(device, allocator);
 
 	// rendering
 	descriptorPool	= std::make_unique<DerpDescriptorPool>(device, swapChain);
-	descriptorSet	= std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
+
+	DerpDescriptorInit descriptorInit;
+		descriptorInit.sampler = &(sampler->handle);
+		descriptorInit.textureView = &(texture->view);
+	descriptorSet	= std::make_unique<DerpDescriptorSet>(descriptorInit, device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer);
 	commandBuffers	= std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
 	sync			= std::make_unique<DerpSync>(device);
 }
@@ -140,7 +160,17 @@ void DerpRenderer::recreateSwapChain()
 	renderPass = std::make_unique<DerpRenderPass>(device, swapChain);
 	std::cout << "\t++renderpass" << std::endl;
 
-	pipeline = std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout);
+	DerpPipelineInit basicPipelineInit;
+	{
+		basicPipelineInit.vertPath = "shaders/vert.spv";
+		basicPipelineInit.fragPath = "shaders/frag.spv";
+		basicPipelineInit.pushSize = sizeof(uint8_t);
+		basicPipelineInit.pushStage = vk::ShaderStageFlagBits::eFragment;
+		basicPipelineInit.hasUniform = true;
+		basicPipelineInit.hasPushConstants = true;
+	}
+
+	pipeline = std::make_unique<DerpPipeline>(device, swapChain, renderPass, descriptorSetLayout, basicPipelineInit);
 	std::cout << "\t++pipeline" << std::endl;
 
 	depthBuffer = std::make_unique<DerpImage>();
@@ -153,7 +183,11 @@ void DerpRenderer::recreateSwapChain()
 	descriptorPool = std::make_unique<DerpDescriptorPool>(device, swapChain);
 	std::cout << "\t++descriptorPool" << std::endl;
 
-	descriptorSet = std::make_unique<DerpDescriptorSet>(device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer, texture, sampler);
+	DerpDescriptorInit descriptorInit;
+	descriptorInit.sampler = &(sampler->handle);
+	descriptorInit.textureView = &(texture->view);
+
+	descriptorSet = std::make_unique<DerpDescriptorSet>(descriptorInit, device, swapChain, descriptorSetLayout, descriptorPool, uniformBuffer);
 	std::cout << "\t++descriptorSet" << std::endl;
 
 	commandBuffers = std::make_unique<DerpCommandBuffer>(device, commandPool, framebuffers);
@@ -174,8 +208,8 @@ void DerpRenderer::cleanup()
 	std::cout << "--sampler" << std::endl;
 	device->handle.destroySampler(sampler->handle);
 
-	std::cout << "--texture view" << std::endl;
-	device->handle.destroyImageView(texture->view);
+	//std::cout << "--texture view" << std::endl;
+	//device->handle.destroyImageView(texture->view);
 
 	//std::cout << "--height view" << std::endl;
 	//device->handle.destroyImageView(heightmap->view);
@@ -304,13 +338,18 @@ void DerpRenderer::beginDraw(Camera* camera)
 	//memcpy(uboTess.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
 
 	//memcpy(uniformBuffer->data, &uboTess, sizeof(uboTess));
+
+	
 }
 
 // draw simple vertices
 void DerpRenderer::drawObject(glm::mat4 model, DerpBufferLocal* inBuffer)
 {
 	matrixToPush.mvp = viewproj * model;
-	cmd->pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eVertex, 0, sizeof(mvp4), &matrixToPush);
+	memcpy(uniformBuffer->data, &viewproj, sizeof(glm::mat4));
+
+	uint8_t texIndex = 1;
+	cmd->pushConstants(pipeline->layout, vk::ShaderStageFlagBits::eFragment, 0, sizeof(uint8_t), &texIndex);
 
 	std::vector<vk::Buffer> buf = { inBuffer->buffer };
 	cmd->bindVertexBuffers(0, buf, { 0 });

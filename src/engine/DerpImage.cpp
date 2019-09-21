@@ -11,39 +11,57 @@ DerpImage::~DerpImage()
 {
 }
 
-void DerpImage::createTexture(std::string file, std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator)
+void DerpImage::createTexture(DerpImageInit& init, std::unique_ptr<DerpDevice>& device, std::unique_ptr<DerpCommandPool>& commandPool, VmaAllocator& allocator)
 {
-	std::cout << "create texture" << std::endl;
+	if (init.path == "")
+		throw std::runtime_error("no texture path specified");
+
+	std::cout << "create texture (video memory): " << init.path << std::endl;
 
 	int texWidth, texHeight, texChannels;
 
 	// read file
-
-	unsigned char* pixels = stbi_load(file.c_str(), &texWidth, &texHeight, &texChannels, 4);
-	vk::DeviceSize imageSize = texWidth * texHeight * sizeof(unsigned char);
-	imageSize = texWidth * texHeight * sizeof(uint32_t);
-
-	std::cout << "\t" << texWidth << "x" << texHeight << ", " << texChannels << " channels, imageSize=" << imageSize << std::endl;
+	unsigned char* pixels = stbi_load(init.path.c_str(), &texWidth, &texHeight, &texChannels, 4);
+	vk::DeviceSize imageSize = texWidth * texHeight * sizeof(unsigned char) * 4;
 
 	if (!pixels) {
-		throw std::runtime_error("failed to load texture image!");
+		throw std::runtime_error("\tfailed to load texture");
 	}
 
+	std::cout << "\t" << texWidth << "x" << texHeight << ", " << texChannels << " channels, imageSize = " << imageSize << " bytes" << std::endl;
+
+
 	// copy to staging
-
 	std::unique_ptr<DerpBufferStaging> stagingBuffer = std::make_unique<DerpBufferStaging>(imageSize, allocator);
-
 	stagingBuffer->copy(pixels);
-
 	stbi_image_free(pixels);
 
+
+	//pick image format
+	switch (texChannels)
+	{
+	case 1:
+		format = vk::Format::eR8Uint;
+		break;
+	case 2:
+		format = vk::Format::eR8G8Uint;
+		break;
+	case 3:
+		format = vk::Format::eR8G8B8A8Unorm;
+		break;
+	case 4:
+		format = vk::Format::eR8G8B8A8Unorm;
+		break;
+	}
+
+
+	// allocate gpu memory
 	vk::ImageCreateInfo imageCreateInfo = vk::ImageCreateInfo().
 		setImageType(vk::ImageType::e2D).
 		setExtent(vk::Extent3D(static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), 1)).
 		setMipLevels(1).
 		setArrayLayers(1).
-		setFormat(vk::Format::eR8G8B8A8Unorm).
-		//setFormat(vk::Format::eR8Unorm).
+		setFormat(format).
 		setTiling(vk::ImageTiling::eOptimal).
 		setInitialLayout(vk::ImageLayout::eUndefined).
 		setUsage(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled).
@@ -58,7 +76,6 @@ void DerpImage::createTexture(std::string file, std::unique_ptr<DerpDevice>& dev
 
 
 	// copy to gpu
-
 	auto allocCI = vk::CommandBufferAllocateInfo().
 		setCommandBufferCount(1).
 		setCommandPool(commandPool->handle).
@@ -108,13 +125,10 @@ void DerpImage::createTexture(std::string file, std::unique_ptr<DerpDevice>& dev
 	device->graphicsQueue.submit(submitInfo, nullptr);
 	device->graphicsQueue.waitIdle();
 	device->handle.freeCommandBuffers(commandPool->handle, cmd);
-
-
-
 	vmaDestroyBuffer(allocator, stagingBuffer->buffer, stagingBuffer->allocation);
 
-	// image view
 
+	// create image view
 	vk::ImageSubresourceRange imageSubresourceRange2 = vk::ImageSubresourceRange().
 		setAspectMask(vk::ImageAspectFlagBits::eColor).
 		setBaseMipLevel(0).
@@ -125,8 +139,7 @@ void DerpImage::createTexture(std::string file, std::unique_ptr<DerpDevice>& dev
 	vk::ImageViewCreateInfo imageViewCreateInfo = vk::ImageViewCreateInfo().
 		setImage(this->handle).
 		setViewType(vk::ImageViewType::e2D).
-		setFormat(vk::Format::eR8G8B8A8Unorm).
-		//setFormat(vk::Format::eR8Unorm).
+		setFormat(format).
 		setSubresourceRange(imageSubresourceRange2);
 
 	view = device->handle.createImageView(imageViewCreateInfo);

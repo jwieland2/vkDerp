@@ -9,6 +9,42 @@
 
 #include <glm/glm.hpp>
 
+// Initialization structs
+// ----------------------------------------------------------------------
+struct DerpPipelineInit {
+	std::string vertPath;
+	std::string tescPath;
+	std::string tesePath;
+	std::string geomPath;
+	std::string fragPath;
+	bool tessellationEnabled = false;
+	bool geometryEnabled = false;
+	bool wireframe = false;
+	uint32_t pushSize;
+	vk::ShaderStageFlagBits pushStage = vk::ShaderStageFlagBits::eVertex;
+	bool hasUniform = false;
+	bool hasPushConstants = false;
+};
+
+struct DerpImageInit {
+	std::string path = "";
+
+};
+
+struct DerpSamplerInit {
+	vk::SamplerAddressMode repeat = vk::SamplerAddressMode::eRepeat;
+	bool compareEnable = VK_FALSE;
+	vk::CompareOp compareOp = vk::CompareOp::eAlways;
+};
+
+struct DerpDescriptorInit {
+	vk::Sampler* sampler;
+	vk::ImageView* textureView;
+};
+
+// Data types
+// ----------------------------------------------------------------------
+
 struct Vertex {
 	glm::vec3 pos;
 	glm::vec3 normal;
@@ -41,7 +77,7 @@ struct mvp4 {
 	glm::mat4 mvp;
 };
 
-	// Shared values for tessellation control and evaluation stages
+// Shared values for tessellation control and evaluation stages
 struct UBO {
 	glm::mat4 projection;
 	glm::mat4 modelview;

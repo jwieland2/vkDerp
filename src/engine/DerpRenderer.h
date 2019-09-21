@@ -89,4 +89,7 @@ public:
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer);
 	void drawObject(glm::mat4 model, DerpBufferLocal* inBuffer, DerpBufferLocal* indexBuffer);
 	void endDraw();
+
+
+
 };
